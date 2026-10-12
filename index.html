@@ -1,0 +1,1477 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Control Room English</title>
+<meta name="theme-color" content="#0d1117">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Control Room">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+:root{
+  /* Layout: sala de control — panel de métricas a la izquierda, tarjeta de emergencia con micrófono al centro, consola tipo terminal abajo */
+  --bg:#0d1117;--side:#0d1117;--card:#161b22;--card-2:#1c2330;--line:#30363d;--ink:#e6edf3;--ink-2:#8b949e;--ink-3:#6e7681;
+  --blue:#1f6feb;--blue-2:#58a6ff;--red:#ff3b4f;--red-2:#f85149;--yellow:#d29922;--yellow-2:#e3b341;--green:#3fb950;--cyan:#39c5cf;--violet:#a371f7;--orange:#f0883e;--term:#010409;
+  --display:"Barlow Semi Condensed","Arial Narrow",sans-serif;
+  --body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,"SFMono-Regular",Consolas,monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);background:var(--bg)}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 15px/1.5 var(--body);-webkit-font-smoothing:antialiased;display:grid;grid-template-columns:304px minmax(0,1fr);min-height:100%}
+[hidden]{display:none!important}
+button{font:inherit;color:inherit;cursor:pointer}
+input{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--blue-2);outline-offset:2px}
+.lab{font:600 11px/1.2 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--ink-2)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;background:var(--card-2);border:1px solid var(--line);border-radius:6px;padding:7px 12px;font-size:13.5px;font-weight:500}
+.btn:hover{border-color:var(--ink-3)}
+.btn svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.btn.primary{background:var(--blue);border-color:var(--blue);color:#ffffff}
+.btn.ghost{background:transparent;border-color:transparent;color:var(--ink-2)}
+
+/* ---------- sidebar ---------- */
+.side{background:var(--side);border-right:1px solid var(--line);padding-inline:18px;padding-block:20px 28px;display:flex;flex-direction:column;gap:22px;position:sticky;top:0;height:100vh;overflow-y:auto}
+.brand{display:flex;align-items:center;gap:10px}
+.brand .dot{width:10px;height:10px;border-radius:50%;background:var(--red);box-shadow:0 0 10px var(--red);animation:beacon 1.6s ease-in-out infinite}
+.brand b{font:700 21px/1 var(--display);letter-spacing:.02em}
+.brand span{font:500 11px var(--mono);color:var(--ink-2);display:block;margin-top:3px}
+.metrics{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.metric{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:10px 11px;display:flex;flex-direction:column;gap:4px;min-width:0}
+.metric b{font:700 26px/1 var(--display);font-variant-numeric:tabular-nums;letter-spacing:.01em}
+.metric small{font:500 11px var(--mono);color:var(--ink-3)}
+.metric.fric b{color:var(--orange)}
+.metric.load b{color:var(--blue-2)}
+.metric.streak b{color:var(--green)}
+.metric.tpa b{color:var(--cyan)}
+.mini{display:flex;justify-content:space-between;font:500 12px var(--mono);color:var(--ink-2);padding-inline:2px}
+.mini b{color:var(--ink);font-weight:600}
+.levels{display:grid;gap:9px}
+.lvrow{display:grid;grid-template-columns:30px minmax(0,1fr) 44px;align-items:center;gap:10px;font:600 12px var(--mono)}
+.lvrow .bar{height:6px;border-radius:3px;background:var(--card-2);overflow:hidden}
+.lvrow .bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--blue),var(--cyan));transition:width .4s}
+.lvrow b{color:var(--ink-2);font-weight:500;text-align:right;font-variant-numeric:tabular-nums}
+.sec{display:flex;flex-direction:column;gap:10px}
+.toggle{display:flex;gap:10px;align-items:flex-start;cursor:pointer;font-size:13.5px}
+.toggle input{appearance:none;-webkit-appearance:none;flex:none;width:34px;height:20px;border-radius:10px;background:var(--card-2);border:1px solid var(--line);position:relative;margin:1px 0 0;cursor:pointer}
+.toggle input::after{content:"";position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:var(--ink-2);transition:transform .15s,background .15s}
+.toggle input:checked{background:var(--blue);border-color:var(--blue)}
+.toggle input:checked::after{transform:translateX(14px);background:#ffffff}
+.toggle small{display:block;color:var(--ink-3);font-size:12px;line-height:1.35}
+.field{display:flex;flex-direction:column;gap:5px}
+.field input{background:var(--term);border:1px solid var(--line);border-radius:6px;padding:7px 9px;font:400 13px var(--mono);width:100%}
+.note{font-size:12px;color:var(--ink-3);line-height:1.4}
+.aistatus{font:500 12px var(--mono);color:var(--ink-2)}
+
+/* ---------- main ---------- */
+.main{min-width:0;padding-inline:24px;padding-block:18px 24px;display:flex;flex-direction:column;gap:16px}
+.topbar{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.chip{font:600 12px var(--mono);letter-spacing:.06em;padding:4px 9px;border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--ink-2)}
+.chip.level{color:#ffffff;border-color:transparent;background:var(--blue)}
+.chip.level[data-level=A2]{background:#238636}
+.chip.level[data-level=B1]{background:#9e6a03}
+.chip.level[data-level=B2]{background:#8957e5}
+.chip.stage{color:var(--ink)}
+.topbar .grow{flex:1}
+.qinfo{font:500 12px var(--mono);color:var(--ink-2)}
+#sideToggle{display:none}
+.emergency{position:relative;background:var(--card);border:1.5px solid var(--red);border-radius:12px;padding:0 0 22px;overflow:hidden;
+  box-shadow:0 0 0 1px rgba(255,59,79,.25),0 0 26px rgba(255,59,79,.28),inset 0 0 40px rgba(255,59,79,.05);animation:alarm 2.6s ease-in-out infinite}
+.emergency.flash{animation:flash .7s ease-out,alarm 2.6s ease-in-out .7s infinite}
+.hazard{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 18px;background:repeating-linear-gradient(-45deg,rgba(255,59,79,.22) 0 12px,rgba(255,59,79,.08) 12px 24px);border-bottom:1px solid rgba(255,59,79,.5)}
+.hazard span{font:700 12px var(--mono);letter-spacing:.18em;color:#ff8a96}
+.timer{font:600 22px var(--mono);font-variant-numeric:tabular-nums;color:var(--ink)}
+.timer.late{color:var(--red-2);text-shadow:0 0 10px rgba(248,81,73,.6)}
+.ebody{display:grid;grid-template-columns:minmax(0,1fr) 220px;gap:22px;padding:18px 20px 0;align-items:center}
+.etext{display:flex;flex-direction:column;gap:10px;min-width:0}
+.etitle{font:600 14px var(--body);color:var(--ink-2)}
+.alert{font:600 clamp(24px,3.1vw,34px)/1.18 var(--display);color:#ffffff;margin:0;text-wrap:balance}
+.instr{display:flex;flex-direction:column;gap:4px;padding:10px 12px;border-left:3px solid var(--yellow);background:rgba(210,153,34,.08);border-radius:0 6px 6px 0}
+.instr p{margin:0;font-size:15.5px}
+.req{font:500 12px var(--mono);color:var(--ink-3)}
+.erow{display:flex;flex-wrap:wrap;gap:8px}
+.micwrap{display:flex;flex-direction:column;align-items:center;gap:12px}
+.mic{width:172px;height:172px;border-radius:50%;border:0;display:grid;place-items:center;color:#ffffff;touch-action:manipulation;-webkit-tap-highlight-color:transparent;transition:background .2s,box-shadow .2s,transform .1s}
+.mic svg{width:66px;height:66px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.mic:active{transform:scale(.97)}
+.mic[data-mode=idle]{background:radial-gradient(circle at 35% 30%,#3b82f6,var(--blue) 60%,#1158c7);box-shadow:0 0 0 6px rgba(31,111,235,.18),0 0 32px rgba(31,111,235,.45)}
+.mic[data-mode=rec]{background:radial-gradient(circle at 35% 30%,#ff6b6b,var(--red-2) 60%,#c4232e);animation:blink .9s steps(2,jump-none) infinite,ring 1.4s ease-out infinite}
+.mic[data-mode=proc]{background:radial-gradient(circle at 35% 30%,#f5c451,var(--yellow) 60%,#9e6a03);color:#1a1300;box-shadow:0 0 0 6px rgba(210,153,34,.2),0 0 30px rgba(210,153,34,.45)}
+.mic[data-mode=proc] svg{animation:spin 1.2s linear infinite}
+.miclabel{font:600 13px var(--mono);color:var(--ink-2);text-align:center;max-width:220px}
+.errbox{margin:14px 20px 0;padding:10px 12px;border-radius:6px;background:rgba(248,81,73,.12);border:1px solid rgba(248,81,73,.5);color:#ffb3ad;font-size:14px}
+
+.result{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;display:flex;flex-direction:column;gap:14px}
+.result[data-ok="1"]{border-color:rgba(63,185,80,.6)}
+.result[data-ok="0"]{border-color:rgba(210,153,34,.6)}
+.rhead{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap}
+.rhead strong{font:700 22px var(--display)}
+.result[data-ok="1"] .rhead strong{color:var(--green)}
+.result[data-ok="0"] .rhead strong{color:var(--yellow-2)}
+.stats{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}
+.stat{background:var(--card-2);border:1px solid var(--line);border-radius:8px;padding:9px 10px;display:flex;flex-direction:column;gap:3px;min-width:0}
+.stat b{font:700 20px/1.1 var(--display);font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.stat b.good{color:var(--green)}
+.stat b.bad{color:var(--red-2)}
+.stat small{font:500 11px var(--mono);color:var(--ink-3)}
+.said{font:500 15px/1.45 var(--mono);color:var(--ink);background:var(--term);border:1px solid var(--line);border-radius:6px;padding:9px 11px;overflow-wrap:anywhere}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.kw{font:500 12px var(--mono);padding:3px 8px;border-radius:5px;border:1px solid}
+.kw.hit{border-color:rgba(63,185,80,.7);color:#7ee787}
+.kw.near{border-color:rgba(210,153,34,.7);color:var(--yellow-2)}
+.kw.miss{border-color:rgba(248,81,73,.6);color:#ffa198;border-style:dashed}
+.penalty{font-size:13.5px;color:#ffa198}
+.verdict{font-size:14.5px;color:var(--ink-2)}
+.optimal{display:flex;gap:12px;align-items:flex-start;background:rgba(31,111,235,.1);border:1px solid rgba(56,139,253,.4);border-radius:8px;padding:11px 12px}
+.optimal p{margin:0;font:500 17px/1.4 var(--body);color:#ffffff}
+.optimal .lab{display:block;margin-bottom:4px;color:var(--blue-2)}
+.optimal .grow{flex:1;min-width:0}
+.ractions{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end}
+.shadow{border-top:1px dashed var(--line);padding-top:12px;display:flex;flex-direction:column;gap:6px}
+.shadow p{margin:0;font-size:14px}
+.shadow #shadowOut{font:500 13px var(--mono);color:var(--cyan)}
+
+.consolewrap{background:var(--term);border:1px solid var(--line);border-radius:10px;overflow:hidden;display:flex;flex-direction:column}
+.chead{display:flex;align-items:center;gap:8px;padding:6px 10px;border-bottom:1px solid var(--line);background:#0b0f14}
+.chead .dots{display:flex;gap:5px}
+.chead .dots i{width:9px;height:9px;border-radius:50%;background:#30363d}
+.chead .dots i:first-child{background:#f85149}
+.chead .dots i:nth-child(2){background:#d29922}
+.chead .dots i:nth-child(3){background:#3fb950}
+.chead span{font:500 12px var(--mono);color:var(--ink-3);flex:1}
+.chead .btn{padding:3px 8px;font-size:12px}
+.console{height:200px;overflow:auto;padding:8px 10px;font:400 12px/1.55 var(--mono);color:#c9d1d9}
+.consolewrap.collapsed .console{display:none}
+.ln{display:grid;grid-template-columns:96px 52px minmax(0,1fr);gap:8px;white-space:pre-wrap;overflow-wrap:anywhere}
+.ln .ts{color:#484f58}
+.ln .lv{font-weight:600;color:#8b949e}
+.ln.lv-ok .lv,.ln.lv-ok .msg{color:#56d364}
+.ln.lv-fail .lv,.ln.lv-err .lv,.ln.lv-err .msg{color:#ff7b72}
+.ln.lv-fail .msg{color:#ffa198}
+.ln.lv-warn .lv,.ln.lv-warn .msg{color:#e3b341}
+.ln.lv-sr .lv{color:#39c5cf}
+.ln.lv-ai .lv{color:#a371f7}
+.ln.lv-sm2 .lv{color:#58a6ff}
+.ln.lv-time .lv{color:#f0883e}
+.ln.lv-alert .lv{color:#ff3b4f}
+.ln.lv-tts .lv{color:#56d4dd}
+.ln.lv-sem .lv{color:#d2a8ff}
+.ln.lv-fsm .lv,.ln.lv-cfg .lv,.ln.lv-sys .lv{color:#6e7681}
+
+.boot{position:fixed;inset:0;z-index:20;background:rgba(1,4,9,.86);backdrop-filter:blur(6px);display:grid;place-items:center;padding-inline:16px;overflow:auto}
+.bootcard{width:min(560px,100%);background:var(--card);border:1.5px solid var(--red);border-radius:14px;box-shadow:0 0 40px rgba(255,59,79,.3);padding:26px;display:flex;flex-direction:column;gap:14px;margin-block:20px}
+.bootcard h1{margin:0;font:700 36px/1.05 var(--display)}
+.bootcard p{margin:0;color:var(--ink-2)}
+.bootcard ul{margin:0;padding-left:18px;display:grid;gap:6px;font-size:14px}
+.bootwarn{color:#ffb3ad}
+.steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.steps div{background:var(--card-2);border:1px solid var(--line);border-radius:8px;padding:10px;display:flex;flex-direction:column;gap:3px}
+.steps b{font:700 16px var(--display)}
+.steps small{color:var(--ink-3);font-size:12.5px;line-height:1.35}
+.bootbtn{align-self:flex-start;padding:12px 22px;font-size:16px;font-weight:600}
+
+@keyframes alarm{0%,100%{box-shadow:0 0 0 1px rgba(255,59,79,.25),0 0 22px rgba(255,59,79,.22),inset 0 0 40px rgba(255,59,79,.04)}50%{box-shadow:0 0 0 1px rgba(255,59,79,.45),0 0 38px rgba(255,59,79,.42),inset 0 0 50px rgba(255,59,79,.08)}}
+@keyframes flash{0%{background:#3a1218}100%{background:var(--card)}}
+@keyframes blink{0%{opacity:1}50%{opacity:.55}}
+@keyframes ring{0%{box-shadow:0 0 0 0 rgba(248,81,73,.55),0 0 34px rgba(248,81,73,.55)}100%{box-shadow:0 0 0 26px rgba(248,81,73,0),0 0 34px rgba(248,81,73,.55)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes beacon{50%{opacity:.35}}
+
+@media (max-width:980px){
+  .ebody{grid-template-columns:minmax(0,1fr)}
+  .micwrap{order:2}
+  .stats{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+@media (max-width:860px){
+  body{grid-template-columns:minmax(0,1fr);display:block}
+  .side{position:static;height:auto;border-right:0;border-bottom:1px solid var(--line);padding-block:14px;gap:14px}
+  .metrics{grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+  .metric{padding:8px}
+  .metric b{font-size:20px}
+  .metric small{display:none}
+  .side .more{display:none}
+  body.side-open .side .more{display:flex}
+  #sideToggle{display:inline-flex}
+  .main{padding-inline:16px}
+  .mic{width:150px;height:150px}
+  .steps{grid-template-columns:minmax(0,1fr)}
+  .ln{grid-template-columns:78px 44px minmax(0,1fr)}
+}
+@media (max-width:520px){
+  .metric .lab{font-size:9.5px;letter-spacing:.04em}
+  .stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .hazard{padding-inline:14px}
+  .ebody{padding-inline:14px}
+  .errbox{margin-inline:14px}
+}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body data-state="boot">
+
+<aside class="side" aria-label="Panel de control">
+  <div class="brand"><span class="dot" aria-hidden="true"></span><div><b>Control Room English</b><span>Inglés de planta · en-US · A1 → B2</span></div></div>
+  <div class="metrics">
+    <div class="metric streak"><span class="lab">Racha</span><b id="mStreak">0</b><small>días seguidos</small></div>
+    <div class="metric tpa"><span class="lab">TPA</span><b id="mTpa">0</b><small>segundos hablando</small></div>
+    <div class="metric fric"><span class="lab">Fricción</span><b id="mFric">—</b><small>ms promedio (50)</small></div>
+    <div class="metric load"><span class="lab">Carga SM-2</span><b id="mLoad">0</b><small id="mLoadSub">en cola</small></div>
+  </div>
+  <div class="mini"><span>EF promedio <b id="mEf">2.50</b></span><span>Aciertos seguidos <b id="mCombo">0</b></span></div>
+  <div class="more sec">
+    <span class="lab">Dominio por nivel</span>
+    <div class="levels">
+      <div class="lvrow" id="lvA1"><span>A1</span><span class="bar"><i></i></span><b>0/0</b></div>
+      <div class="lvrow" id="lvA2"><span>A2</span><span class="bar"><i></i></span><b>0/0</b></div>
+      <div class="lvrow" id="lvB1"><span>B1</span><span class="bar"><i></i></span><b>0/0</b></div>
+      <div class="lvrow" id="lvB2"><span>B2</span><span class="bar"><i></i></span><b>0/0</b></div>
+    </div>
+    <p class="note">Un nivel se abre cuando dominas el 70 % del anterior. Los 7 procesos aparecen en todos los niveles; lo que sube es la gramática exigida.</p>
+  </div>
+  <div class="more sec">
+    <span class="lab">Ajustes</span>
+    <label class="toggle"><input type="checkbox" id="optTts"><span>Leer la alerta en voz alta<small>Voz de EE. UU. por la radio de la planta.</small></span></label>
+    <label class="toggle"><input type="checkbox" id="optStrict"><span>Cronómetro estricto<small>Corre desde que aparece la alerta. Si lo apagas, corre desde que termina el audio.</small></span></label>
+    <label class="toggle"><input type="checkbox" id="optAuto"><span>Avance automático<small>Pasa sola a la siguiente alerta y al ejercicio de repetición.</small></span></label>
+  </div>
+  <div class="more sec">
+    <span class="lab">Juez de IA (opcional)</span>
+    <label class="toggle"><input type="checkbox" id="optAi"><span>Usar juez IA de OpenAI<small>Si falla o no hay internet, se usa la matriz difusa local.</small></span></label>
+    <div class="field"><label class="lab" for="aiKey">API key</label><input type="password" id="aiKey" autocomplete="off" spellcheck="false" placeholder="sk-…"></div>
+    <div class="field"><label class="lab" for="aiModel">Modelo</label><input type="text" id="aiModel" autocomplete="off" spellcheck="false"></div>
+    <button class="btn" id="aiTest" type="button">Probar conexión</button>
+    <p class="aistatus" id="aiStatus"></p>
+    <p class="note">La clave se guarda solo en este navegador y se envía directo a OpenAI. No la uses en un equipo compartido.</p>
+  </div>
+  <div class="more sec">
+    <button class="btn ghost" id="resetBtn" type="button" style="align-self:flex-start;padding-inline:0">Borrar progreso</button>
+  </div>
+</aside>
+
+<main class="main">
+  <div class="topbar">
+    <button class="btn" id="sideToggle" type="button" aria-expanded="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg>Panel</button>
+    <span class="chip level" id="chipLevel">—</span>
+    <span class="chip stage" id="chipStage">—</span>
+    <span class="chip" id="chipId">—</span>
+    <span class="chip" id="chipState">—</span>
+    <span class="grow"></span>
+    <span class="qinfo" id="queueInfo">Cola SM-2: 0</span>
+  </div>
+
+  <section class="emergency" id="emergency" aria-live="polite">
+    <div class="hazard"><span>Alerta operativa</span><span class="timer" id="timer" aria-label="Fricción cognitiva">0 ms</span></div>
+    <div class="ebody">
+      <div class="etext">
+        <span class="etitle" id="alertTitle">Esperando inicio de turno</span>
+        <p class="alert" id="alertText" lang="en">Stand by for the first alert.</p>
+        <div class="instr"><span class="lab">Instrucción</span><p id="alertInstr">Toca «Iniciar turno».</p></div>
+        <span class="req">Nivel exige: <span id="gramReq">—</span> · mínimo <span id="minWords">—</span> palabras · responder en menos de 3 000 ms</span>
+        <div class="erow"><button class="btn" id="btnPlayAlert" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M16.5 9a4 4 0 0 1 0 6"/></svg>Escuchar alerta lenta</button></div>
+      </div>
+      <div class="micwrap">
+        <button class="mic" id="mic" type="button" data-mode="idle" aria-label="Micrófono"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3M8 21h8"/></svg></button>
+        <span class="miclabel" id="micLabel">Toca y responde por radio</span>
+      </div>
+    </div>
+    <div class="errbox" id="errBox" hidden role="alert"></div>
+  </section>
+
+  <section class="result" id="result" hidden aria-live="polite">
+    <div class="rhead"><strong id="rTitle"></strong><span class="lab">Tu respuesta</span></div>
+    <div class="said" id="rTranscript" lang="en"></div>
+    <div class="stats">
+      <div class="stat"><small>SemScore</small><b id="rSem"></b><small id="rSemSrc"></small></div>
+      <div class="stat"><small>Fricción Δt</small><b id="rFric"></b><small>límite 3 000 ms</small></div>
+      <div class="stat"><small>Calidad q (0–5)</small><b id="rQ"></b><small>SM-2</small></div>
+      <div class="stat"><small>Factor EF</small><b id="rEf"></b><small>mínimo 1,3</small></div>
+      <div class="stat"><small>Próximo repaso</small><b id="rNext"></b><small>&nbsp;</small></div>
+    </div>
+    <div class="chips" id="rGroups"></div>
+    <p class="penalty" id="rPenalty" hidden></p>
+    <p class="verdict" id="rVerdict" hidden></p>
+    <div class="optimal">
+      <div class="grow"><span class="lab">Frase óptima · American English</span><p id="rOptimal" lang="en"></p>
+        <p id="rBetterRow" hidden style="margin-top:8px;font-size:14px;color:var(--ink-2)"><span class="lab" style="display:inline;margin-right:6px">Juez IA</span><span id="rBetter" lang="en"></span></p></div>
+      <button class="btn" id="btnPlayOptimal" type="button" aria-label="Escuchar frase óptima"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M16.5 9a4 4 0 0 1 0 6M19 6.5a8 8 0 0 1 0 11"/></svg></button>
+    </div>
+    <div class="shadow" id="shadowBox" hidden>
+      <p><b>Producción activa:</b> repite la frase óptima en voz alta antes de la siguiente alerta.</p>
+      <p id="shadowOut"></p>
+    </div>
+    <div class="ractions"><button class="btn primary" id="btnNext" type="button">Siguiente alerta</button></div>
+  </section>
+
+  <section class="consolewrap" id="consoleWrap" aria-label="Consola de eventos">
+    <div class="chead"><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span><span>operator@control-room:~$ tail -f events.log</span>
+      <button class="btn ghost" id="consoleClear" type="button">Limpiar</button><button class="btn ghost" id="consoleToggle" type="button">Ocultar</button></div>
+    <div class="console" id="console" role="log"></div>
+  </section>
+</main>
+
+<div class="boot" id="boot" role="dialog" aria-modal="true" aria-labelledby="bootTitle">
+  <div class="bootcard">
+    <span class="lab" style="color:#ff8a96">Turno de guardia · Planta concentradora</span>
+    <h1 id="bootTitle">Control Room English</h1>
+    <p>Te llegan alertas reales de planta por radio, en inglés de EE. UU. Respondes en voz alta, rápido y con la gramática de tu nivel. El sistema mide tu tiempo de reacción, evalúa el significado de lo que dices y programa los repasos con SM-2.</p>
+    <div class="steps">
+      <div><b>1 · Lee y escucha</b><small>La alerta aparece y la radio la lee. El cronómetro arranca.</small></div>
+      <div><b>2 · Toca y habla</b><small>Toca el micrófono antes de 3 s y responde en inglés.</small></div>
+      <div><b>3 · Repite la óptima</b><small>Si fallas, dices la frase óptima en voz alta.</small></div>
+    </div>
+    <ul class="bootwarn" id="bootWarn" hidden></ul>
+    <button class="btn primary bootbtn" id="bootBtn" type="button">Iniciar turno</button>
+    <p class="note">Espacio = micrófono · Enter = siguiente alerta. Funciona en Chrome (Android o computadora) y Safari (iPhone), con internet.</p>
+  </div>
+</div>
+
+<script>
+'use strict';
+/* ============ DICCIONARIO DE CRISIS EN METALURGIA EXTRACTIVA ============
+   Los niveles se distinguen por la gramática exigida en la respuesta, no por el proceso:
+   A1 = chunks de radio cortos · A2 = oraciones simples en pasado / presente continuo
+   B1 = causa-efecto, present perfect y condicionales · B2 = voz pasiva, modales de deducción y recomendaciones con matiz */
+const MISSIONS=[
+/* ---------- A1 ---------- */
+{id:"A1-FLO-1",nivel:"A1",etapa:"Flotación",titulo:"Espuma colapsando en el rougher",
+ alerta:"Control room to rougher operator: the froth in cell three is collapsing. Add frother. Confirm.",
+ instruccion:"Confirma por radio y di que agregas espumante ahora.",
+ keywords:["@ack","frother","@add"],feedback:"Copy that. Adding frother to cell three now."},
+{id:"A1-FLO-2",nivel:"A1",etapa:"Flotación",titulo:"Celda rebalsando",
+ alerta:"Rougher cell five is overflowing! Lower the level now.",
+ instruccion:"Confirma y di que bajas el nivel.",
+ keywords:["@ack","@decrease","level"],feedback:"Roger. Lowering the level in cell five."},
+{id:"A1-TAI-1",nivel:"A1",etapa:"Relaves",titulo:"Bomba de relaves caída",
+ alerta:"Tailings pump two is down! Start the standby pump. Confirm.",
+ instruccion:"Confirma y di que arrancas la bomba de reserva.",
+ keywords:["@ack","@start","standby"],feedback:"Copy. Starting the standby pump now."},
+{id:"A1-TAI-2",nivel:"A1",etapa:"Relaves",titulo:"Fuga en la tubería de relaves",
+ alerta:"There is a tailings leak on the pipeline. Close valve four now.",
+ instruccion:"Confirma y di que cierras la válvula cuatro.",
+ keywords:["@ack","@close","valve","4"],feedback:"Roger. Closing valve four now."},
+{id:"A1-GRI-1",nivel:"A1",etapa:"Molienda",titulo:"Potencia alta en el SAG",
+ alerta:"SAG mill power is too high. Reduce the feed. Confirm.",
+ instruccion:"Confirma y di que reduces la alimentación.",
+ keywords:["@ack","@decrease","feed"],feedback:"Copy that. Reducing the feed now."},
+{id:"A1-GRI-2",nivel:"A1",etapa:"Molienda",titulo:"Molino de bolas detenido",
+ alerta:"Ball mill one just stopped! Call maintenance.",
+ instruccion:"Confirma y di que llamas a mantenimiento ahora.",
+ keywords:["@ack","call","maintenance"],feedback:"Roger. Calling maintenance now."},
+{id:"A1-REA-1",nivel:"A1",etapa:"Reactivos",titulo:"Tanque de cal bajo",
+ alerta:"The lime tank is low. Start the lime pump. Confirm.",
+ instruccion:"Confirma y di que arrancas la bomba de cal.",
+ keywords:["@ack","@start","lime"],feedback:"Copy. Starting the lime pump now."},
+{id:"A1-REA-2",nivel:"A1",etapa:"Reactivos",titulo:"Bomba de colector apagada",
+ alerta:"The collector pump is off! Check it now.",
+ instruccion:"Confirma y di que revisas la bomba de colector.",
+ keywords:["@ack","@check","collector"],feedback:"Roger. Checking the collector pump now."},
+{id:"A1-CYC-1",nivel:"A1",etapa:"Hidrociclones",titulo:"Presión alta en la batería",
+ alerta:"Cyclone pressure is high. Open one more cyclone. Confirm.",
+ instruccion:"Confirma y di que abres un ciclón más.",
+ keywords:["@ack","@open","cyclone"],feedback:"Copy that. Opening one more cyclone now."},
+{id:"A1-CYC-2",nivel:"A1",etapa:"Hidrociclones",titulo:"Ciclón en soga",
+ alerta:"Cyclone four is roping! Close it now.",
+ instruccion:"Confirma y di que cierras el ciclón cuatro.",
+ keywords:["@ack","@close","cyclone|4"],feedback:"Roger. Closing cyclone four now."},
+{id:"A1-LIX-1",nivel:"A1",etapa:"Lixiviación",titulo:"Bomba de refino caída",
+ alerta:"The raffinate pump is down. Start the backup pump. Confirm.",
+ instruccion:"Confirma y di que arrancas la bomba de respaldo.",
+ keywords:["@ack","@start","standby"],feedback:"Copy. Starting the backup pump now."},
+{id:"A1-LIX-2",nivel:"A1",etapa:"Lixiviación",titulo:"Fuga de ácido en la pila",
+ alerta:"Acid leak at the heap! Stop the acid pump now!",
+ instruccion:"Confirma y di que paras la bomba de ácido.",
+ keywords:["@ack","@stop","acid"],feedback:"Roger. Stopping the acid pump now."},
+{id:"A1-PYR-1",nivel:"A1",etapa:"Pirometalurgia",titulo:"Temperatura alta en el horno",
+ alerta:"Furnace temperature is too high. Reduce the oxygen. Confirm.",
+ instruccion:"Confirma y di que reduces el oxígeno.",
+ keywords:["@ack","@decrease","oxygen"],feedback:"Copy that. Reducing the oxygen now."},
+{id:"A1-PYR-2",nivel:"A1",etapa:"Pirometalurgia",titulo:"Sangría de escoria",
+ alerta:"Tap the slag now. Wear your face shield.",
+ instruccion:"Confirma, di que sangras la escoria y que tienes la careta puesta.",
+ keywords:["@ack","tap|tapping","slag","face shield|shield|on"],feedback:"Roger. Tapping the slag now. Face shield on."},
+
+/* ---------- A2 ---------- */
+{id:"A2-FLO-1",nivel:"A2",etapa:"Flotación",titulo:"Ley baja en el cleaner",
+ alerta:"Supervisor here. Why is the cleaner concentrate grade low this morning?",
+ instruccion:"Explica en pasado: el pH bajó durante la noche y agregaste más cal.",
+ keywords:["ph","@fell","lime","@added"],feedback:"The pH dropped during the night, so I added more lime."},
+{id:"A2-FLO-2",nivel:"A2",etapa:"Flotación",titulo:"Ronda en el área de flotación",
+ alerta:"What are you doing in the flotation area right now?",
+ instruccion:"Di en presente continuo que estás revisando las celdas y ajustando el aire.",
+ keywords:["checking|inspecting|looking at","cells","adjusting|changing|setting","air"],feedback:"I'm checking the cells and adjusting the air flow."},
+{id:"A2-TAI-1",nivel:"A2",etapa:"Relaves",titulo:"Densidad baja en el espesador",
+ alerta:"Thickener operator, what happened to the underflow density last night?",
+ instruccion:"Di en pasado que la densidad bajó y que agregaste más floculante.",
+ keywords:["density","@fell","flocculant","@added"],feedback:"The underflow density dropped, so I added more flocculant."},
+{id:"A2-TAI-2",nivel:"A2",etapa:"Relaves",titulo:"Inspección de la presa",
+ alerta:"Where are you going right now?",
+ instruccion:"Di que vas a la presa de relaves a revisar la tubería.",
+ keywords:["going","dam","@check","pipeline"],feedback:"I'm going to the tailings dam to check the pipeline."},
+{id:"A2-GRI-1",nivel:"A2",etapa:"Molienda",titulo:"Parada del molino anoche",
+ alerta:"Why did the mill stop last night?",
+ instruccion:"Di en pasado que se rompió un perno del forro y que lo cambiaron.",
+ keywords:["liner|bolt","broke|failed|came loose|was broken","replaced|changed|fixed"],feedback:"A liner bolt broke, so we replaced it."},
+{id:"A2-GRI-2",nivel:"A2",etapa:"Molienda",titulo:"Lectura de datos del molino",
+ alerta:"Read me the mill data, please.",
+ instruccion:"Lee: alimentación 2 800 t/h y potencia al 82 %.",
+ keywords:["2800","tons","82","percent"],feedback:"We're at twenty-eight hundred tons per hour, and the power is at eighty-two percent."},
+{id:"A2-REA-1",nivel:"A2",etapa:"Reactivos",titulo:"Preparación de reactivos",
+ alerta:"What reagents did you prepare this morning?",
+ instruccion:"Di que preparaste xantato y cal esta mañana.",
+ keywords:["prepared|mixed|made","xanthate","lime"],feedback:"I prepared xanthate and lime this morning."},
+{id:"A2-REA-2",nivel:"A2",etapa:"Reactivos",titulo:"Dosificación de colector",
+ alerta:"How much collector are you adding now?",
+ instruccion:"Di que estás agregando 25 gramos por tonelada.",
+ keywords:["adding|dosing|using","25","grams","ton"],feedback:"I'm adding twenty-five grams per ton."},
+{id:"A2-CYC-1",nivel:"A2",etapa:"Hidrociclones",titulo:"Ciclón bloqueado",
+ alerta:"What did you see on the cyclones?",
+ instruccion:"Di en pasado que el ciclón 3 estaba bloqueado y que lo cerraste.",
+ keywords:["3","blocked|plugged|choked","closed|shut"],feedback:"Cyclone three was blocked, so I closed it."},
+{id:"A2-CYC-2",nivel:"A2",etapa:"Hidrociclones",titulo:"Presión de alimentación",
+ alerta:"What's the cyclone feed pressure now?",
+ instruccion:"Di que la presión es 90 kPa y que está subiendo.",
+ keywords:["pressure","90","kpa","@rising"],feedback:"The pressure is ninety kPa, and it's going up."},
+{id:"A2-LIX-1",nivel:"A2",etapa:"Lixiviación",titulo:"Goteros de la pila",
+ alerta:"What did you check on the leach pad this morning?",
+ instruccion:"Di que revisaste los goteros y que algunos estaban bloqueados.",
+ keywords:["checked|inspected","drippers","blocked|plugged|clogged"],feedback:"I checked the drippers, and some of them were blocked."},
+{id:"A2-LIX-2",nivel:"A2",etapa:"Lixiviación",titulo:"Concentración del PLS",
+ alerta:"What's the PLS copper concentration?",
+ instruccion:"Di que es 3,2 gramos por litro y que está bajando.",
+ keywords:["3.2","grams","liter","@falling"],feedback:"It's three point two grams per liter, and it's going down."},
+{id:"A2-PYR-1",nivel:"A2",etapa:"Pirometalurgia",titulo:"Toberas del convertidor",
+ alerta:"What happened at the converter during your shift?",
+ instruccion:"Di en pasado que el convertidor se detuvo y que limpiaron las toberas.",
+ keywords:["converter","stopped|shut down|went down|was down","cleaned|punched|cleared","tuyeres"],feedback:"The converter stopped, and we cleaned the tuyeres."},
+{id:"A2-PYR-2",nivel:"A2",etapa:"Pirometalurgia",titulo:"Ley de la mata",
+ alerta:"What's the matte grade now?",
+ instruccion:"Di que la ley de la mata es 62 % y que está estable.",
+ keywords:["matte","62","percent","stable|steady|fine|ok"],feedback:"The matte grade is sixty-two percent, and it's stable."},
+
+/* ---------- B1 ---------- */
+{id:"B1-FLO-1",nivel:"B1",etapa:"Flotación",titulo:"Caída de recuperación",
+ alerta:"Recovery has dropped from ninety to eighty-four percent since the shift started. What's going on?",
+ instruccion:"Explica la causa con «because» y di qué harás «if» no mejora.",
+ keywords:["recovery","coarse|grind|p80|ph|collector|feed|clay","@increase|@decrease|@check|call","if"],
+ feedback:"Recovery dropped because the feed is coarser than usual. I've increased the collector, and if it doesn't improve in thirty minutes, I'll ask the mill to grind finer."},
+{id:"B1-FLO-2",nivel:"B1",etapa:"Flotación",titulo:"Espuma aguada en los cleaners",
+ alerta:"The froth in the cleaners looks watery, and the grade is falling. Give me an update.",
+ instruccion:"Di la causa (exceso de espumante) y qué has hecho (present perfect).",
+ keywords:["frother","too much|excess|high","have reduced|have cut|have lowered|have decreased|reduced","grade"],
+ feedback:"There's too much frother in the cleaners, so the froth is watery. I've reduced the dosage, and the grade is starting to recover."},
+{id:"B1-TAI-1",nivel:"B1",etapa:"Relaves",titulo:"Rebose turbio del espesador",
+ alerta:"The thickener overflow is cloudy. What's the problem, and what will you do?",
+ instruccion:"Da la causa con «because» y un plan con «if».",
+ keywords:["cloudy|overflow|solids","flocculant","@increase|@check","if"],
+ feedback:"The overflow is cloudy because the flocculant dosage is too low. I've increased it, and if the water doesn't clear in twenty minutes, I'll check the dosing pump."},
+{id:"B1-TAI-2",nivel:"B1",etapa:"Relaves",titulo:"Presión subiendo en la línea",
+ alerta:"Since this morning, the tailings line pressure has been rising. Update?",
+ instruccion:"Di qué has revisado (present perfect), qué sospechas y qué hiciste.",
+ keywords:["pressure|line","have checked|checked|have inspected|inspected","sanding|blocked|blockage|plugged|plug","water|density"],
+ feedback:"I've checked the line, and it looks like it's sanding up near the booster station, so I've added dilution water to lower the density."},
+{id:"B1-GRI-1",nivel:"B1",etapa:"Molienda",titulo:"SAG sobrecargándose",
+ alerta:"The SAG mill bearing pressure is rising and the power is dropping. What's happening?",
+ instruccion:"Explica la causa con «because» y la acción con «so».",
+ keywords:["overload|overloading|overloaded|full","harder|hard|ore|coarse","@decrease","feed"],
+ feedback:"The mill is overloading because the ore is harder, so I've reduced the feed by two hundred tons per hour."},
+{id:"B1-GRI-2",nivel:"B1",etapa:"Molienda",titulo:"Cambios en el circuito",
+ alerta:"Have you changed anything in the grinding circuit this shift?",
+ instruccion:"Responde con present perfect qué cambiaste y por qué.",
+ keywords:["have added|have increased|have reduced|have changed|have adjusted|added|increased|reduced","water|density|feed|balls","because|since","too high|too low|high|low"],
+ feedback:"Yes, I've added more water to the mill because the density was too high."},
+{id:"B1-REA-1",nivel:"B1",etapa:"Reactivos",titulo:"Bomba de xantato disparándose",
+ alerta:"The xanthate dosing pump keeps tripping. What should we do?",
+ instruccion:"Explica la causa, la acción y qué harás «if» vuelve a pasar.",
+ keywords:["blocked|line|overload|air|motor","@start|switched|standby","if","maintenance|@check"],
+ feedback:"It keeps tripping because the line is partially blocked, so I've switched to the standby pump. If it trips again, I'll call maintenance."},
+{id:"B1-REA-2",nivel:"B1",etapa:"Reactivos",titulo:"Consumo de reactivos en alza",
+ alerta:"Reagent consumption has increased this week. Any idea why?",
+ instruccion:"Explica con «because» qué cambió en el mineral y la consecuencia.",
+ keywords:["has gone up|has increased|has risen|increased|gone up","ore|feed","oxidized|clay|grade|harder|fines","collector|reagent|lime|more"],
+ feedback:"Consumption has gone up because the ore is more oxidized, so we've needed more collector to keep recovery stable."},
+{id:"B1-CYC-1",nivel:"B1",etapa:"Hidrociclones",titulo:"Alimentación gruesa a flotación",
+ alerta:"The flotation feed is too coarse. What's wrong with the cyclones?",
+ instruccion:"Explica la causa con «because» y la acción con «so».",
+ keywords:["roping|blocked|worn|apex|pressure","cyclones|cyclone","water|density|@decrease|@close|@open","coarse|feed"],
+ feedback:"The feed is coarse because two cyclones are roping, so I've added water to the sump to lower the density."},
+{id:"B1-CYC-2",nivel:"B1",etapa:"Hidrociclones",titulo:"Plan de contingencia",
+ alerta:"If the cyclone feed pump trips, what will you do?",
+ instruccion:"Responde con un condicional: «If…, I'll…».",
+ keywords:["if","@start|standby","@decrease|cut|stop","feed|mill|sump"],
+ feedback:"If the cyclone pump trips, I'll start the standby pump and cut the mill feed until the sump level is under control."},
+{id:"B1-LIX-1",nivel:"B1",etapa:"Lixiviación",titulo:"Caída de ley del PLS",
+ alerta:"The PLS grade has dropped this week. Why?",
+ instruccion:"Da la causa con «because» y di qué has hecho.",
+ keywords:["has dropped|dropped|has gone down|has fallen","irrigation|flow|channeling|drippers|acid","channeling|blocked|too high|too low","@decrease|@increase|have reduced|reduced"],
+ feedback:"The PLS grade has dropped because the irrigation rate was too high, so the solution is channeling. I've reduced the flow on cells four and five."},
+{id:"B1-LIX-2",nivel:"B1",etapa:"Lixiviación",titulo:"Borra en el decantador de SX",
+ alerta:"There's crud building up in the SX settler. What will you do?",
+ instruccion:"Explica la causa y tu plan con «if».",
+ keywords:["crud","solids|pls|clarifier|organic","pump|remove|clean|centrifuge","if"],
+ feedback:"The crud is building up because there are too many solids in the PLS. I'll pump it out tonight, and if it comes back, I'll ask them to check the clarifier."},
+{id:"B1-PYR-1",nivel:"B1",etapa:"Pirometalurgia",titulo:"Cobre en la escoria",
+ alerta:"There's too much copper in the slag. What's the cause?",
+ instruccion:"Da la causa con «because» y la corrección con «so».",
+ keywords:["slag","magnetite|viscous|viscosity|temperature|silica|settling","silica|flux|temperature|settling","@increase|@decrease|added|adjusted"],
+ feedback:"There's too much copper in the slag because the magnetite is high, so the slag is viscous. I've added more silica flux and increased the settling time."},
+{id:"B1-PYR-2",nivel:"B1",etapa:"Pirometalurgia",titulo:"SO2 bajo en la planta de ácido",
+ alerta:"The acid plant is complaining about low SO2. What changed?",
+ instruccion:"Explica la causa con «because» y qué han hecho.",
+ keywords:["so2|sulfur dioxide|gas","air|leak|leaking|infiltration","diluted|dilution|low","sealed|fixed|closed|repaired"],
+ feedback:"SO2 is low because air is leaking into the off-gas system, so the gas is diluted. We've sealed the uptake, and it's coming back up."},
+
+/* ---------- B2 ---------- */
+{id:"B2-FLO-1",nivel:"B2",etapa:"Flotación",titulo:"Pirita en el concentrado",
+ alerta:"Metallurgist on the radio: pyrite is reporting to the copper concentrate. What's your assessment?",
+ instruccion:"Da una hipótesis con might/could y una recomendación en voz pasiva.",
+ keywords:["pyrite","ph|lime","@increase|be increased|be raised","checked|monitored|measured"],
+ feedback:"The pH might have dropped below ten, so pyrite could be floating. I'd recommend that the lime addition be increased and the pH be checked every thirty minutes."},
+{id:"B2-FLO-2",nivel:"B2",etapa:"Flotación",titulo:"Explicación para la gerencia",
+ alerta:"Plant manager: we lost two points of recovery last week. I need a short explanation for the morning meeting.",
+ instruccion:"Resume la causa en voz pasiva y propone una prueba con matiz.",
+ keywords:["recovery|loss","caused|affected|lowered|reduced","clay|slimes|coarse|ph|reagent|collector","trial|test"],
+ feedback:"Most of the loss was caused by clay-rich ore from phase five, which increased slime coating. I'd suggest that a two-week dispersant trial be run before the dosage is changed permanently."},
+{id:"B2-TAI-1",nivel:"B2",etapa:"Relaves",titulo:"Filtración en el pie de la presa",
+ alerta:"Environmental officer: a small seepage was reported at the toe of the dam. Brief me.",
+ instruccion:"Informa en voz pasiva qué se hizo y recomienda con «should/would».",
+ keywords:["seepage|leak","inspected|sampled|measured|contained","berm|contained|pond|sump","piezometers|monitoring|monitored|engineer"],
+ feedback:"The seepage was inspected and sampled this morning, and the flow has been contained with a temporary berm. I'd recommend that the piezometers be read daily until the geotechnical engineer has reviewed it."},
+{id:"B2-TAI-2",nivel:"B2",etapa:"Relaves",titulo:"Riesgo de recuperación de agua",
+ alerta:"Manager: if water recovery from the thickener keeps falling, what's the risk?",
+ instruccion:"Usa un condicional, una deducción con may/might y una recomendación en pasiva.",
+ keywords:["if","water","fresh water|make up water|cost|costs|throughput","flocculant|thickener|reviewed|optimized"],
+ feedback:"If water recovery keeps falling, we might have to bring in more fresh water, which would increase costs. I'd suggest that the flocculant dosage be reviewed before the dry season starts."},
+{id:"B2-GRI-1",nivel:"B2",etapa:"Molienda",titulo:"P80 más grueso",
+ alerta:"Metallurgist: the P80 has gone from 150 to 190 microns. What could be causing it?",
+ instruccion:"Propón causas con could/might y una recomendación en voz pasiva.",
+ keywords:["harder|hardness|ore","liners|worn|balls|media|charge","checked|inspected|measured","blended|blending|blend"],
+ feedback:"It could be caused by harder ore from the new pit, or the liners might be worn. I'd suggest that the ball charge be checked and the feed be blended until the cause is confirmed."},
+{id:"B2-GRI-2",nivel:"B2",etapa:"Molienda",titulo:"¿Subir la carga de bolas?",
+ alerta:"Manager: would it make sense to increase the ball charge?",
+ instruccion:"Responde con matiz: condición, desventaja y recomendación en pasiva.",
+ keywords:["grind|power|throughput","if|provided|only if","liner|wear|cost|overload","trial|test"],
+ feedback:"It could improve the grind, but only if there's spare power. However, liner wear would increase, so I'd recommend that a two-week trial be run first."},
+{id:"B2-REA-1",nivel:"B2",etapa:"Reactivos",titulo:"Diseño de prueba de colector",
+ alerta:"A new collector is being tested. How should the trial be run?",
+ instruccion:"Propón el diseño en voz pasiva y con «should/would».",
+ keywords:["line|circuit","baseline|current|other line","recovery|grade","weeks|days|shifts"],
+ feedback:"I'd suggest that the new collector be tested on one line for two weeks, while the other line is kept on the current reagent as a baseline, so recovery and grade can be compared fairly."},
+{id:"B2-REA-2",nivel:"B2",etapa:"Reactivos",titulo:"Derrame de xantato",
+ alerta:"Safety officer: a small xanthate spill was reported. Explain what was done.",
+ instruccion:"Informa en voz pasiva y cierra con una recomendación.",
+ keywords:["spill|xanthate","contained|cleaned|isolated","barricaded|ppe|respirator|area","storage|procedure|reviewed"],
+ feedback:"The spill was contained and cleaned up right away, and the area was barricaded. Everyone involved wore full PPE, and I'd recommend that the drum storage be reviewed."},
+{id:"B2-CYC-1",nivel:"B2",etapa:"Hidrociclones",titulo:"Carga circulante alta",
+ alerta:"Metallurgist: the circulating load seems too high. What's your view?",
+ instruccion:"Da una deducción con seems/might y una recomendación en pasiva.",
+ keywords:["circulating load|load","apex|apexes|vortex|worn","inspected|checked|replaced","density|pressure"],
+ feedback:"The circulating load seems to be above four hundred percent, which might be caused by worn apexes. I'd recommend that the apexes be inspected at the next stop and that the cyclone feed density be reduced slightly."},
+{id:"B2-CYC-2",nivel:"B2",etapa:"Hidrociclones",titulo:"Cambio anticipado de ápex",
+ alerta:"The contractor asked why we replaced the apexes early. Explain it to him.",
+ instruccion:"Explica en voz pasiva por qué se cambiaron y qué habría pasado si no.",
+ keywords:["replaced|changed","worn|wear","coarse|coarser|overflow|roping","recovery|flotation"],
+ feedback:"The apexes were replaced early because they had worn faster than expected, and the overflow was getting coarser. Otherwise, flotation recovery would have dropped."},
+{id:"B2-LIX-1",nivel:"B2",etapa:"Lixiviación",titulo:"Recuperación de la pila bajo modelo",
+ alerta:"Manager: copper recovery from the heap is lower than modeled. What's your assessment?",
+ instruccion:"Propón una causa con could/might y recomienda pruebas en voz pasiva.",
+ keywords:["permeability|channeling|fines|clay|compaction|irrigation|acid","column|columns|tests|samples","agglomeration|curing|acid|irrigation","stacked|ore"],
+ feedback:"The lower recovery could be due to poor permeability, since the ore has more fines than expected. I'd recommend that column tests be run on the new ore and that the agglomeration be checked before more ore is stacked."},
+{id:"B2-LIX-2",nivel:"B2",etapa:"Lixiviación",titulo:"Cátodos nodulares en EW",
+ alerta:"Electrowinning: the cathodes are rough and nodular. What would you look at first?",
+ instruccion:"Explica qué revisarías primero, con could/might y voz pasiva.",
+ keywords:["organic|entrainment|entrained","electrolyte","guar|additive|current density|current","reviewed|checked|adjusted"],
+ feedback:"First, I'd check whether organic is being entrained into the electrolyte, because that could cause nodular growth. The guar dosage and the current density should also be reviewed."},
+{id:"B2-PYR-1",nivel:"B2",etapa:"Pirometalurgia",titulo:"Derrame de mata en la piquera",
+ alerta:"Shift report: a matte runout happened at tap hole two. Report it to the manager.",
+ instruccion:"Informa en voz pasiva, menciona la seguridad y recomienda una inspección.",
+ keywords:["tap hole|taphole","contained|plugged|closed|stopped","nobody|no one|no injuries|injured|safe","refractory|inspected|inspection"],
+ feedback:"A matte runout was reported at tap hole two at three a.m. It was contained with the mud gun, and nobody was injured. I'd recommend that the tap hole refractory be inspected before it's opened again."},
+{id:"B2-PYR-2",nivel:"B2",etapa:"Pirometalurgia",titulo:"¿Subir la alimentación al horno flash?",
+ alerta:"Manager: should we increase the concentrate feed rate to the flash furnace?",
+ instruccion:"Responde con condición (provided/if), riesgo y recomendación en pasiva.",
+ keywords:["provided|if|as long as","acid plant|off gas|gas","cooling|temperature|refractory","trial|monitored|monitoring"],
+ feedback:"We could increase it by five percent, provided the acid plant can handle the extra off-gas. However, the cooling elements would run hotter, so I'd suggest that a short trial be run with close monitoring."}
+];
+/* ============ NORMALIZACIÓN Y COINCIDENCIA DIFUSA ============ */
+/* ================= EVALUACIÓN DE RESPUESTAS ================= */
+const N_UNITS={zero:0,one:1,two:2,three:3,four:4,five:5,six:6,seven:7,eight:8,nine:9};
+const N_TEENS={ten:10,eleven:11,twelve:12,thirteen:13,fourteen:14,fifteen:15,sixteen:16,seventeen:17,eighteen:18,nineteen:19};
+const N_TENS={twenty:20,thirty:30,forty:40,fifty:50,sixty:60,seventy:70,eighty:80,ninety:90};
+const N_NEXT={start:['zero','unit','teen','tens'],zero:[],unit:['hundred','thousand','million'],teen:['hundred','thousand'],tens:['unit','thousand','million'],hundred:['unit','teen','tens','thousand','million'],thousand:['unit','teen','tens'],million:['unit','teen','tens','thousand']};
+const ORD={first:'one',second:'two',third:'three',fourth:'four',fifth:'five',sixth:'six',seventh:'seven',eighth:'eight',ninth:'nine',tenth:'ten',eleventh:'eleven',twelfth:'twelve',thirteenth:'thirteen',fourteenth:'fourteen',fifteenth:'fifteen',sixteenth:'sixteen',seventeenth:'seventeen',eighteenth:'eighteen',nineteenth:'nineteen',twentieth:'twenty',thirtieth:'thirty'};
+const SPELL={tonnes:'tons',tonne:'ton',metres:'meters',metre:'meter',litres:'liters',litre:'liter',sulphuric:'sulfuric',sulphide:'sulfide',sulphides:'sulfides',sulphur:'sulfur',sulphate:'sulfate',analyse:'analyze',analysed:'analyzed',analysing:'analyzing',colour:'color',grey:'gray',okay:'ok',centre:'center',programme:'program',favour:'favor',aluminium:'aluminum',vapour:'vapor',practise:'practice',practising:'practicing',standardised:'standardized',optimisation:'optimization',organisation:'organization'};
+
+function numKind(w){
+  if(w==='zero')return 'zero';
+  if(w in N_UNITS)return 'unit';
+  if(w in N_TEENS)return 'teen';
+  if(w in N_TENS)return 'tens';
+  if(w==='hundred'||w==='thousand'||w==='million')return w;
+  return null;
+}
+function wordsToNums(tokens){
+  const out=[];
+  let i=0;
+  while(i<tokens.length){
+    const w=tokens[i];
+    const startA=(w==='a'&&(tokens[i+1]==='hundred'||tokens[i+1]==='thousand'));
+    if(!startA&&!N_NEXT.start.includes(numKind(w))){out.push(w);i++;continue;}
+    let total=0,cur=0,last='start',j=i;
+    if(startA){cur=1;last='unit';j=i+1;}
+    while(j<tokens.length){
+      const t=tokens[j],k=numKind(t);
+      if(t==='and'&&(last==='hundred'||last==='thousand')&&j+1<tokens.length&&['unit','teen','tens'].includes(numKind(tokens[j+1]))){j++;continue;}
+      if(!k||!N_NEXT[last].includes(k))break;
+      if(k==='unit'||k==='zero')cur+=N_UNITS[t];
+      else if(k==='teen')cur+=N_TEENS[t];
+      else if(k==='tens')cur+=N_TENS[t];
+      else if(k==='hundred')cur=(cur||1)*100;
+      else if(k==='thousand'){total+=(cur||1)*1000;cur=0;}
+      else if(k==='million'){total=(total+(cur||1))*1000000;cur=0;}
+      last=k;j++;
+    }
+    let num=String(total+cur);
+    if(tokens[j]==='point'){
+      let dec='',m=j+1;
+      while(m<tokens.length&&(numKind(tokens[m])==='unit'||numKind(tokens[m])==='zero'||/^\d$/.test(tokens[m]))){dec+=/^\d$/.test(tokens[m])?tokens[m]:N_UNITS[tokens[m]];m++;}
+      if(dec){num+='.'+dec;j=m;}
+    }
+    out.push(num);i=j;
+  }
+  for(let k=0;k<out.length-2;k++){
+    if(/^\d+$/.test(out[k])&&out[k+1]==='point'&&/^\d+$/.test(out[k+2]))out.splice(k,3,out[k]+'.'+out[k+2]);
+  }
+  return out;
+}
+function norm(s){
+  s=String(s||'').toLowerCase();
+  s=s.replace(/[’‘`´]/g,"'");
+  s=s.replace(/(\d),(?=\d{3}\b)/g,'$1');
+  s=s.replace(/\$\s?(\d+(?:\.\d+)?)/g,' $1 dollars ');
+  s=s.replace(/\b(\d+)(st|nd|rd|th)\b/g,'$1').replace(/(\d)(am|pm)\b/g,'$1 $2').replace(/\b(\d+)([a-z])\b/g,'$1 $2');
+  s=s.replace(/per cent/g,'percent').replace(/%/g,' percent ');
+  s=s.replace(/[µμ]m\b/g,' microns ').replace(/°\s*c\b/g,' degrees celsius ').replace(/°/g,' degrees ');
+  s=s.replace(/\bwon't\b/g,'will not').replace(/\bcan't\b/g,'can not').replace(/\bcannot\b/g,'can not').replace(/\bshan't\b/g,'shall not');
+  s=s.replace(/n't\b/g,' not').replace(/'re\b/g,' are').replace(/'m\b/g,' am').replace(/'ll\b/g,' will').replace(/'ve\b/g,' have').replace(/'d\b/g,' would');
+  s=s.replace(/\b(it|that|there|what|he|she|where|who|here|let)'s\b/g,(m,a)=>a==='let'?'let us':a+' is');
+  s=s.replace(/'s\b/g,'');
+  s=s.replace(/(\d)\.(\d)/g,'$1xdotx$2');
+  s=s.replace(/[^a-z0-9\s]/g,' ').replace(/xdotx/g,'.');
+  let t=s.split(/\s+/).filter(Boolean).map(w=>ORD[w]||SPELL[w]||w);
+  t=wordsToNums(t);
+  const isD=x=>/^\d/.test(x||'');
+  t=t.map((w,i)=>(w==='oh'&&(isD(t[i-1])||isD(t[i+1])))||(w==='o'&&isD(t[i-1])&&isD(t[i+1]))?'0':w);
+  const o=[];
+  for(let i=0;i<t.length;i++){
+    if((t[i]==='am'||t[i]==='pm')&&i>0&&/^\d/.test(t[i-1]))o.push(t[i][0],'m');
+    else o.push(t[i]);
+  }
+  return o;
+}
+function lev(a,b){
+  const m=a.length,n=b.length;
+  if(!m)return n;if(!n)return m;
+  let prev=Array.from({length:n+1},(_,j)=>j);
+  for(let i=1;i<=m;i++){
+    const cur=[i];
+    for(let j=1;j<=n;j++)cur[j]=Math.min(prev[j]+1,cur[j-1]+1,prev[j-1]+(a[i-1]===b[j-1]?0:1));
+    prev=cur;
+  }
+  return prev[n];
+}
+function eq(a,b){
+  if(a===b)return true;
+  if(/\d/.test(a)||/\d/.test(b))return false;
+  if(Math.min(a.length,b.length)>=3&&(a+'s'===b||b+'s'===a||a+'es'===b||b+'es'===a))return true;
+  if(Math.min(a.length,b.length)<4)return false;
+  return lev(a,b)/Math.max(a.length,b.length)<=0.25;
+}
+/* une dos palabras reconocidas por separado cuando juntas forman una palabra de la referencia (hydro + cyclone) */
+function mergeTo(said,ref){
+  const long=ref.filter(w=>w.length>=5&&!/\d/.test(w));
+  if(!long.length)return said;
+  const out=[];
+  for(let i=0;i<said.length;i++){
+    if(i+1<said.length){
+      const j=said[i]+said[i+1];
+      if(long.some(r=>eq(r,j))&&!long.some(r=>eq(r,said[i]))){out.push(j);i++;continue;}
+    }
+    out.push(said[i]);
+  }
+  return out;
+}
+function lcsCount(a,b){
+  const m=a.length,n=b.length;
+  const dp=Array.from({length:m+1},()=>new Array(n+1).fill(0));
+  for(let i=1;i<=m;i++)for(let j=1;j<=n;j++)dp[i][j]=eq(a[i-1],b[j-1])?dp[i-1][j-1]+1:Math.max(dp[i-1][j],dp[i][j-1]);
+  return dp[m][n];
+}
+function seqScore(refStr,saidToks){
+  let ref=norm(refStr);
+  if(!ref.length||!saidToks.length)return 0;
+  const said=mergeTo(saidToks,ref);
+  ref=mergeTo(ref,said);
+  if(ref.join('')===said.join(''))return 1;
+  return lcsCount(ref,said)/ref.length;
+}
+const DSKIP=new Set(['dollars','dollar','and','cents','cent','bucks','point']);
+function digitRun(saidToks,d){
+  for(let i=0;i<saidToks.length;i++){
+    if(!/^\d/.test(saidToks[i]))continue;
+    let acc='';
+    for(let j=i;j<saidToks.length;j++){
+      const t=saidToks[j];
+      if(/^\d+(\.\d+)?$/.test(t)){acc+=t.replace('.','');if(acc===d)return true;if(acc.length>=d.length)break;}
+      else if(!DSKIP.has(t))break;
+    }
+  }
+  return false;
+}
+function contains(saidToks,alt){
+  if(typeof alt==='string'&&alt[0]==='#')return digitRun(saidToks,alt.slice(1));
+  let a=norm(alt);
+  if(!a.length)return false;
+  const s=mergeTo(saidToks,a);
+  a=mergeTo(a,s);
+  const aj=a.join('');
+  for(let i=0;i<s.length;i++){
+    let ok=true;
+    for(let k=0;k<a.length;k++){if(i+k>=s.length||!eq(a[k],s[i+k])){ok=false;break;}}
+    if(ok)return true;
+    if(a.length>1||aj.length>=6){
+      let acc='';
+      for(let k=i;k<s.length&&acc.length<aj.length+3;k++){
+        acc+=s[k];
+        if(k>i&&(acc===aj||(aj.length>=6&&!/\d/.test(aj)&&eq(acc,aj))))return true;
+      }
+    }
+  }
+  return false;
+}
+/* ============ UTILIDADES ============ */
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const DAY=86400000;
+const pad=(n,l=2)=>String(n).padStart(l,'0');
+function localDay(d=new Date()){return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());}
+function startOfDay(ts=Date.now()){const d=new Date(ts);d.setHours(0,0,0,0);return d.getTime();}
+const LEVELS=['A1','A2','B1','B2'];
+const NEW_PER_DAY=8;
+const FRICTION_LIMIT=3000;
+const SEM_PASS=85;
+const MINW={A1:2,A2:5,B1:12,B2:18};
+
+/* ============ CONSOLA DE EVENTOS ============ */
+const LOG_MAX=300;
+function log(level,msg){
+  const el=$('#console');if(!el)return;
+  const d=new Date();
+  const ts=`${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}.${pad(d.getMilliseconds(),3)}`;
+  const line=document.createElement('div');
+  line.className='ln lv-'+level.toLowerCase();
+  line.innerHTML=`<span class="ts">${ts}</span><span class="lv">${esc(level.padEnd(5))}</span><span class="msg">${esc(msg)}</span>`;
+  el.appendChild(line);
+  while(el.childElementCount>LOG_MAX)el.firstElementChild.remove();
+  el.scrollTop=el.scrollHeight;
+}
+
+/* ============ MAPA ASOCIATIVO DE SINÓNIMOS TÉCNICOS ============ */
+const SYN={
+  ack:['copy','copy that','roger','roger that','confirm','confirmed','got it','will do','ok','okay','understood','affirmative','on it','wilco','10 4'],
+  add:['add','adding','added','increase','increasing','raise','raising','more','dose','dosing','bump up','boost','ramp up','put in','putting in'],
+  added:['added','increased','raised','dosed','put in','put more','adding'],
+  increase:['increase','increasing','increased','raise','raising','raised','bump up','bumped up','boost','boosted','ramp up','ramped up','more','add','adding','added','higher'],
+  decrease:['reduce','reducing','reduced','lower','lowering','lowered','cut','cutting','decrease','decreasing','decreased','drop','dropping','back off','backing off','less','bring down','bringing down','turn down','turning down'],
+  start:['start','starting','started','start up','starting up','turn on','turning on','switch on','switching on','switch to','switching to','switched to','switched','run','running','bring online','put on','kick on'],
+  stop:['stop','stopping','stopped','shut down','shutting down','shut off','shutting off','turn off','turning off','kill','killing','trip','isolate','isolating'],
+  close:['close','closing','closed','shut','shutting','isolate','isolating'],
+  open:['open','opening','opened','put on','bring on','bringing on','add','adding','online'],
+  check:['check','checking','checked','inspect','inspecting','inspected','look at','looking at','verify','verifying','go see','test'],
+  fell:['dropped','fell','went down','decreased','was low','got low','dipped','came down'],
+  rising:['rising','going up','increasing','climbing','getting higher','coming up'],
+  falling:['falling','going down','dropping','decreasing','coming down'],
+  frother:['frother','frothers','frothier','mibc','foamer'],
+  collector:['collector','collectors','xanthate','pax','sipx'],
+  xanthate:['xanthate','xanthates','collector','pax','sipx','zan thate'],
+  standby:['standby','stand by','backup','back up','spare','other pump','reserve','second pump'],
+  maintenance:['maintenance','mechanic','mechanics','fitter','fitters','electrician'],
+  tailings:['tailings','tails','tailing'],
+  cyclone:['cyclone','cyclones','hydrocyclone','hydrocyclones','hydro cyclone'],
+  cyclones:['cyclones','cyclone','hydrocyclones'],
+  flocculant:['flocculant','flocculants','floc','flocculent'],
+  lime:['lime','milk of lime','calcium oxide','lyme'],
+  acid:['acid','sulfuric','sulfuric acid','h2so4'],
+  feed:['feed','feed rate','tonnage','throughput','tons'],
+  level:['level','pulp level','froth level','levels'],
+  valve:['valve','valves'],
+  dam:['dam','tailings dam','tsf','storage facility','tailings storage','pond'],
+  pipeline:['pipeline','pipe','line','pipes','lines'],
+  drippers:['drippers','dripper','emitters','emitter','drip lines','drip line','drippers line'],
+  tuyeres:['tuyeres','tuyere','tweers','tweer','tuyere s','twyers'],
+  oxygen:['oxygen','o2','o 2','oxygen enrichment'],
+  tons:['tons','ton','tonnes','tonne','tph'],
+  ton:['ton','tons','tonne','tonnes'],
+  grams:['grams','gram'],
+  liter:['liter','liters','litre','litres'],
+  percent:['percent'],
+  kpa:['kpa','kilopascals','kilopascal','k pa','kpas'],
+  ph:['ph','p h','pea h','ph level'],
+  call:['call','calling','radio','contact','get','phone'],
+  cells:['cells','cell'],
+  density:['density','solids','percent solids','specific gravity'],
+  water:['water','dilution water','process water'],
+  grade:['grade','assay','grades'],
+  recovery:['recovery','recoveries'],
+  matte:['matte','mat','mats','matt'],
+  converter:['converter','converters'],
+  pressure:['pressure','pressures'],
+  slag:['slag','slags']
+};
+function expandKeyword(k){
+  const out=new Set();
+  k.split('|').map(s=>s.trim().toLowerCase()).filter(Boolean).forEach(a=>{
+    if(a[0]==='@'){(SYN[a.slice(1)]||[a.slice(1)]).forEach(x=>out.add(x));}
+    else{out.add(a);(SYN[a]||[]).forEach(x=>out.add(x));}
+  });
+  return[...out];
+}
+function keywordLabel(k){const a=k.split('|')[0];return a[0]==='@'?(SYN[a.slice(1)]||[a.slice(1)])[0]:a;}
+
+/* ============ VALIDADOR SEMÁNTICO LOCAL (MATRIZ DIFUSA) ============ */
+const GRAM={
+  B1:[{label:'conector (because, so, if…)',re:/\b(because|so|since|if|when|but|then|after|while|due to|as a result|unless)\b/}],
+  B2:[{label:'modal o matiz (might, could, would…)',re:/\b(might|may|could|would|should|seem|seems|likely|probably|recommend|suggest)\b/},
+      {label:'voz pasiva (be + participio)',re:/\b(is|are|was|were|be|been|being)\s+(\w+ed|\w+en|made|done|run|cut|kept|held|built|sent|set|put|found|brought|lost|shut|spent|left|paid|told|sold|read|fed|led|split|met|hit)\b/}]
+};
+function altScore(said,alt){
+  if(contains(said,alt))return 1;
+  const a=norm(alt);
+  if(a.length!==1||/\d/.test(a[0])||a[0].length<4)return 0;
+  let best=0;
+  for(const w of said){
+    if(/\d/.test(w)||w.length<3)continue;
+    const s=1-lev(w,a[0])/Math.max(w.length,a[0].length);
+    if(s>best)best=s;
+  }
+  return best>=0.6?Math.round(best*0.8*100)/100:0;
+}
+function localSem(m,raw){
+  const st=norm(raw);
+  const joined=' '+st.join(' ')+' ';
+  const groups=m.keywords.map(k=>{
+    let best=0,hit='';
+    for(const a of expandKeyword(k)){const s=altScore(st,a);if(s>best){best=s;hit=a;}if(best===1)break;}
+    return{k,label:keywordLabel(k),score:best,hit};
+  });
+  const kw=groups.reduce((a,g)=>a+g.score,0)/groups.length;
+  const len=Math.min(1,st.length/MINW[m.nivel]);
+  const reqs=GRAM[m.nivel]||[];
+  const gram=reqs.map(r=>({label:r.label,ok:r.re.test(joined)}));
+  const g=reqs.length?gram.filter(x=>x.ok).length/reqs.length:1;
+  const score=Math.round(1000*(0.75*kw+0.10*len+0.15*g))/10;
+  return{score,groups,words:st.length,len,gram,kw};
+}
+function bestLocal(m,alts){
+  let best=null;
+  for(const a of alts){if(!a)continue;const r=localSem(m,a);r.text=a;if(!best||r.score>best.score)best=r;}
+  return best;
+}
+
+/* ============ JUEZ DE IA (OPCIONAL) ============ */
+const AI_SYSTEM='You are a strict but fair American mining shift supervisor and a certified ESL examiner. A Spanish-speaking metallurgical engineer answered a plant radio alert by voice. The transcript comes from speech recognition: ignore punctuation, casing and small recognition errors. Score 0-100 for: (1) completing the Spanish instruction, (2) technical correctness for the metallurgical situation, (3) the grammar expected at the CEFR level (A1 short radio chunks; A2 simple past or present continuous; B1 cause-effect, present perfect, conditionals; B2 passive voice, modals of deduction and hedged recommendations), (4) natural American plant English. Reply ONLY with JSON: {"score": integer, "verdict": "one short sentence in Spanish", "better": "one natural American English version of the answer"}.';
+async function aiJudge(m,transcript){
+  const key=(S.settings.aiKey||'').trim();
+  if(!S.settings.aiOn||!key)return null;
+  if(!navigator.onLine){log('WARN','Juez IA: sin conexión → fallback local');return null;}
+  const ctrl=new AbortController();
+  const timer=setTimeout(()=>ctrl.abort(),9000);
+  const t0=performance.now();
+  log('AI',`POST chat/completions model=${S.settings.aiModel||'gpt-4o-mini'}`);
+  try{
+    const res=await fetch('https://api.openai.com/v1/chat/completions',{
+      method:'POST',signal:ctrl.signal,
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
+      body:JSON.stringify({model:S.settings.aiModel||'gpt-4o-mini',temperature:0,response_format:{type:'json_object'},
+        messages:[{role:'system',content:AI_SYSTEM},{role:'user',content:JSON.stringify({level:m.nivel,stage:m.etapa,alert:m.alerta,instruction_es:m.instruccion,key_concepts:m.keywords.map(keywordLabel),model_answer:m.feedback,trainee_transcript:transcript})}]})
+    });
+    if(!res.ok){
+      let detail='';try{const j=await res.json();detail=j.error&&j.error.message?' · '+j.error.message:'';}catch(e){detail='';}
+      log('ERR',`Juez IA HTTP ${res.status}${detail} → fallback local`);return null;
+    }
+    const j=await res.json();
+    const c=JSON.parse(j.choices[0].message.content);
+    const score=Math.max(0,Math.min(100,Number(c.score)));
+    if(!Number.isFinite(score)){log('ERR','Juez IA: respuesta sin puntaje → fallback local');return null;}
+    log('AI',`score=${score} en ${Math.round(performance.now()-t0)} ms`);
+    return{score,verdict:String(c.verdict||''),better:String(c.better||'')};
+  }catch(e){
+    log('ERR','Juez IA: '+(e.name==='AbortError'?'tiempo agotado (9 s)':e.message)+' → fallback local');return null;
+  }finally{clearTimeout(timer);}
+}
+
+/* ============ ESTADO PERSISTENTE (localStorage) ============ */
+const KEY='control-room-english-v1';
+function freshState(){
+  return{v:1,cards:{},history:[],streak:{days:0,last:''},tpaMs:0,combo:0,queue:[],queueDay:'',newToday:0,
+    settings:{tts:true,auto:true,strict:true,aiOn:false,aiKey:'',aiModel:'gpt-4o-mini'}};
+}
+let S=freshState();
+try{
+  const raw=localStorage.getItem(KEY);
+  if(raw){const o=JSON.parse(raw);S={...freshState(),...o,settings:{...freshState().settings,...(o.settings||{})},streak:{...freshState().streak,...(o.streak||{})}};}
+}catch(e){S=freshState();}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){log('WARN','localStorage no disponible: el progreso no se guardará');}}
+function card(id){
+  if(!S.cards[id])S.cards[id]={ef:2.5,n:0,interval:0,due:0,state:'new',lapses:0,cf:0,reps:0,lastQ:null};
+  return S.cards[id];
+}
+const byId=Object.fromEntries(MISSIONS.map(m=>[m.id,m]));
+
+/* ============ ALGORITMO SUPERMEMO-2 ============ */
+function qualityFrom(sem,friction){
+  if(sem>=SEM_PASS){if(friction<=FRICTION_LIMIT)return friction<1500?5:4;return 3;}
+  if(sem>=60)return 2;
+  if(sem>0)return 1;
+  return 0;
+}
+function nextEF(ef,q){return Math.max(1.3,ef+(0.1-(5-q)*(0.08+(5-q)*0.02)));}
+function sm2(c,q){
+  const ef0=c.ef;
+  c.ef=Math.round(nextEF(c.ef,q)*1000)/1000;
+  c.reps+=1;c.lastQ=q;
+  if(q>=4){
+    c.n+=1;
+    c.interval=c.n===1?1:c.n===2?6:Math.round(c.interval*c.ef);
+    c.due=startOfDay()+c.interval*DAY;
+    c.state='review';c.cf=0;
+  }else{
+    if(q<3){c.n=0;c.lapses+=1;}
+    c.interval=0;c.due=Date.now();c.state='learning';c.cf+=1;
+  }
+  return{ef0,ef:c.ef};
+}
+function allowedNew(){
+  const out=[];
+  for(let i=0;i<LEVELS.length;i++){
+    if(i>0){
+      const prev=MISSIONS.filter(m=>m.nivel===LEVELS[i-1]);
+      const ok=prev.filter(m=>card(m.id).state==='review').length/prev.length;
+      if(ok<0.7)break;
+    }
+    MISSIONS.filter(m=>m.nivel===LEVELS[i]&&card(m.id).state==='new').forEach(m=>out.push(m.id));
+  }
+  return out;
+}
+function rebuildQueue(extraNew=0){
+  const today=localDay();
+  if(S.queueDay!==today){S.queueDay=today;S.newToday=0;S.queue=S.queue.filter(id=>card(id).state!=='new'||id in byId);}
+  S.queue=S.queue.filter(id=>id in byId);
+  const end=startOfDay()+DAY;
+  const due=MISSIONS.filter(m=>{const c=card(m.id);return c.state!=='new'&&c.due<end&&!S.queue.includes(m.id);})
+    .sort((a,b)=>card(a.id).due-card(b.id).due).map(m=>m.id);
+  const room=Math.max(0,NEW_PER_DAY-S.newToday)+extraNew;
+  const fresh=allowedNew().filter(id=>!S.queue.includes(id)).slice(0,room);
+  S.queue.push(...due,...fresh);
+  S.newToday+=fresh.length;
+  save();
+  log('SM2',`cola reconstruida: ${due.length} repasos + ${fresh.length} nuevas = ${S.queue.length}`);
+}
+function reviewAhead(n){
+  const ahead=MISSIONS.filter(m=>card(m.id).state==='review'&&!S.queue.includes(m.id)).sort((a,b)=>card(a.id).due-card(b.id).due).slice(0,n).map(m=>m.id);
+  S.queue.push(...ahead);save();
+  log('SM2',`repaso adelantado: ${ahead.length} tarjetas`);
+  return ahead.length;
+}
+function requeue(id,q){
+  const i=S.queue.indexOf(id);if(i>=0)S.queue.splice(i,1);
+  if(q>=4)return'done';
+  const c=card(id);
+  if(c.cf>=3){S.queue.push(id);c.cf=0;log('WARN',`Amortiguación de frustración: ${id} falló 3 veces seguidas → final de la cola`);return'end';}
+  const pos=Math.min(3,S.queue.length);S.queue.splice(pos,0,id);
+  log('SM2',`${id} reinsertada en la posición ${pos+1} de la cola`);
+  return'soon';
+}
+function bumpStreak(){
+  const t=localDay();if(S.streak.last===t)return false;
+  const y=localDay(new Date(Date.now()-DAY));
+  S.streak.days=S.streak.last===y?S.streak.days+1:1;S.streak.last=t;return true;
+}
+function streakShown(){
+  const t=localDay(),y=localDay(new Date(Date.now()-DAY));
+  return(S.streak.last===t||S.streak.last===y)?S.streak.days:0;
+}
+
+/* ============ VOZ: SÍNTESIS en-US ============ */
+const HAS_TTS='speechSynthesis' in window;
+let VOICES=[];
+function loadVoices(){try{VOICES=speechSynthesis.getVoices()||[];}catch(e){VOICES=[];}}
+if(HAS_TTS){loadVoices();try{speechSynthesis.onvoiceschanged=loadVoices;}catch(e){}}
+function usVoice(){
+  if(!VOICES.length)loadVoices();
+  const us=VOICES.filter(v=>(v.lang||'').toLowerCase().replace('_','-').startsWith('en-us'));
+  const rank=v=>(/natural|neural/i.test(v.name)?4:0)+(/google/i.test(v.name)?3:0)+(/online/i.test(v.name)?2:0)+(/aria|jenny|guy|samantha|alex|allison|ava/i.test(v.name)?1:0);
+  return us.sort((a,b)=>rank(b)-rank(a))[0]||null;
+}
+let ttsGen=0;
+function hush(){ttsGen++;if(HAS_TTS){try{speechSynthesis.cancel();}catch(e){}}}
+function speakPart(text,rate){
+  return new Promise(res=>{
+    let u;try{u=new SpeechSynthesisUtterance(text);}catch(e){res();return;}
+    const v=usVoice();
+    if(v){try{u.voice=v;}catch(e){}}
+    u.lang='en-US';u.rate=rate;
+    let done=false;const fin=()=>{if(done)return;done=true;clearTimeout(wd);res();};
+    const wd=setTimeout(fin,2500+text.length*95);
+    u.onend=fin;u.onerror=fin;
+    try{speechSynthesis.resume();speechSynthesis.speak(u);}catch(e){fin();}
+  });
+}
+async function speak(text,rate=0.95){
+  if(!HAS_TTS||!text)return true;
+  const g=++ttsGen;
+  for(const part of String(text).split(/(?<=[.!?])\s+/)){if(g!==ttsGen)return false;await speakPart(part,rate);}
+  return g===ttsGen;
+}
+
+/* ============ VOZ: RECONOCIMIENTO en-US (continuous=false, interimResults=false) ============ */
+const SR=window.SpeechRecognition||window.webkitSpeechRecognition||null;
+const SR_ERR={
+  'not-allowed':'Micrófono bloqueado. Toca el candado junto a la dirección, permite el micrófono y recarga la página.',
+  'service-not-allowed':'El navegador no permite el reconocimiento de voz aquí. Usa Chrome (Android o computadora) o Safari (iPhone) y, en iPhone, activa Siri y Dictado.',
+  'audio-capture':'No se detecta un micrófono. Revisa que no lo esté usando otra app.',
+  'network':'El reconocimiento de voz necesita internet. Revisa tu conexión.',
+  'language-not-supported':'Este navegador no reconoce inglés de EE. UU.',
+  'bad-grammar':'Error interno del reconocedor. Intenta otra vez.',
+  'start':'No se pudo iniciar el micrófono. Toca el botón otra vez.',
+  'unknown':'Error desconocido del micrófono. Intenta otra vez.'
+};
+let REC=null;
+function recognizeOnce(){
+  return new Promise((resolve,reject)=>{
+    let r;
+    try{r=new SR();}catch(e){reject({code:'start'});return;}
+    REC=r;
+    r.lang='en-US';r.continuous=false;r.interimResults=false;r.maxAlternatives=5;
+    let alts=[],err=null,audioStart=performance.now(),speechStart=0,speechEnd=0;
+    r.onaudiostart=()=>{audioStart=performance.now();log('SR','audiostart');};
+    r.onspeechstart=()=>{speechStart=performance.now();log('SR','speechstart');};
+    r.onspeechend=()=>{speechEnd=performance.now();log('SR','speechend');};
+    r.onresult=e=>{
+      const res=e.results[e.results.length-1];
+      alts=Array.from(res).map(a=>({t:String(a.transcript||'').trim(),c:a.confidence})).filter(a=>a.t);
+    };
+    r.onerror=e=>{err=e.error||'unknown';log('ERR','SR onerror: '+err);};
+    r.onend=()=>{
+      if(REC===r)REC=null;
+      const now=performance.now();
+      let tpa=0;
+      if(speechStart)tpa=(speechEnd||now)-speechStart;
+      else if(alts.length)tpa=now-audioStart;
+      if(err&&err!=='no-speech'&&err!=='aborted'){reject({code:err,tpa});return;}
+      resolve({alts,err,tpa});
+    };
+    try{r.start();log('SR','start lang=en-US continuous=false interimResults=false');}
+    catch(e){REC=null;reject({code:'start'});}
+  });
+}
+function stopRec(){if(REC){try{REC.stop();}catch(e){}}}
+function abortRec(){if(REC){try{REC.abort();}catch(e){}}REC=null;}
+async function listenAnswer(m,{shadow=false}={}){
+  const t0=Date.now();let acc=[],tpa=0,seg=0;
+  RUN.stopLong=false;
+  while(true){
+    seg++;
+    const r=await recognizeOnce();
+    tpa+=r.tpa;
+    if(r.err==='aborted')return{alts:[],tpa,aborted:true};
+    if(!r.alts.length)break;
+    acc=acc.length?acc.map((a,i)=>a+' '+(r.alts[Math.min(i,r.alts.length-1)].t)):r.alts.map(a=>a.t);
+    log('SR',`segmento ${seg}: "${r.alts[0].t}" conf=${r.alts[0].c!=null?Number(r.alts[0].c).toFixed(2):'n/d'}`);
+    if(shadow||RUN.stopLong)break;
+    if(m.nivel==='A1'||m.nivel==='A2')break;
+    const loc=bestLocal(m,acc);
+    if(loc.score>=SEM_PASS||loc.words>=MINW[m.nivel]*2.2)break;
+    if(Date.now()-t0>90000)break;
+    log('SR',`respuesta ${m.nivel} incompleta (${loc.words} palabras): sigo escuchando`);
+    setMic('rec','Sigue hablando… toca para terminar');
+  }
+  return{alts:acc,tpa,aborted:false};
+}
+
+/* ============ MÁQUINA DE ESTADOS ============ */
+const FSM={
+  state:'boot',
+  table:{
+    boot:['alert','empty'],
+    alert:['listening','alert','empty'],
+    listening:['processing','alert'],
+    processing:['feedback'],
+    feedback:['shadow','alert','empty'],
+    shadow:['shadowListening','alert','empty'],
+    shadowListening:['shadow','alert','empty'],
+    empty:['alert','empty']
+  },
+  go(next,why){
+    const ok=(this.table[this.state]||[]).includes(next);
+    if(!ok){log('ERR',`transición inválida ${this.state} → ${next}`);return false;}
+    log('FSM',`${this.state} → ${next}${why?' · '+why:''}`);
+    this.state=next;document.body.dataset.state=next;return true;
+  }
+};
+const RUN={id:null,t0:0,armed:false,friction:0,raf:0,stopLong:false,result:null,flow:0,shadowTries:0,shadowDone:false};
+
+/* ============ INTERFAZ ============ */
+function fmtInt(n){return Math.round(n).toLocaleString('es-PE');}
+function renderMetrics(){
+  $('#mStreak').textContent=streakShown();
+  $('#mTpa').textContent=fmtInt(S.tpaMs/1000);
+  const last=S.history.slice(-50);
+  $('#mFric').textContent=last.length?fmtInt(last.reduce((a,h)=>a+h.friction,0)/last.length):'—';
+  $('#mLoad').textContent=S.queue.length;
+  const cardsDue=S.queue.filter(id=>card(id).state!=='new').length;
+  $('#mLoadSub').textContent=`${cardsDue} repasos · ${S.queue.length-cardsDue} nuevas`;
+  LEVELS.forEach(L=>{
+    const ms=MISSIONS.filter(m=>m.nivel===L);
+    const ok=ms.filter(m=>card(m.id).state==='review').length;
+    $('#lv'+L+' i').style.width=(100*ok/ms.length)+'%';
+    $('#lv'+L+' b').textContent=`${ok}/${ms.length}`;
+  });
+  const avgEF=MISSIONS.map(m=>card(m.id)).filter(c=>c.reps>0);
+  $('#mEf').textContent=avgEF.length?(avgEF.reduce((a,c)=>a+c.ef,0)/avgEF.length).toFixed(2):'2.50';
+  $('#mCombo').textContent=S.combo;
+}
+function setMic(mode,label){
+  const b=$('#mic');b.dataset.mode=mode;$('#micLabel').textContent=label;b.setAttribute('aria-label',label);
+}
+function tickTimer(){
+  cancelAnimationFrame(RUN.raf);
+  const el=$('#timer');
+  const loop=()=>{
+    if(!RUN.armed){return;}
+    const ms=performance.now()-RUN.t0;
+    el.textContent=fmtInt(ms)+' ms';
+    el.classList.toggle('late',ms>FRICTION_LIMIT);
+    RUN.raf=requestAnimationFrame(loop);
+  };
+  loop();
+}
+function armTimer(reason){
+  RUN.t0=performance.now();RUN.armed=true;
+  log('TIME',`cronómetro iniciado (${reason}) t0=${RUN.t0.toFixed(1)}`);
+  tickTimer();
+}
+function showAlert(id){
+  const m=byId[id];RUN.id=id;RUN.result=null;RUN.shadowTries=0;RUN.shadowDone=false;
+  const c=card(id);
+  $('#chipLevel').textContent=m.nivel;
+  $('#chipLevel').dataset.level=m.nivel;
+  $('#chipStage').textContent=m.etapa;
+  $('#chipId').textContent=m.id;
+  $('#chipState').textContent=c.state==='new'?'NUEVA':c.state==='learning'?'EN APRENDIZAJE':'REPASO';
+  $('#queueInfo').textContent=`Cola SM-2: ${S.queue.length} · EF ${c.ef.toFixed(2)}`;
+  $('#alertTitle').textContent=m.titulo;
+  $('#alertText').textContent=m.alerta;
+  $('#alertInstr').textContent=m.instruccion;
+  $('#gramReq').textContent=(GRAM[m.nivel]||[]).map(g=>g.label).join(' + ')||'respuesta corta de radio';
+  $('#minWords').textContent=MINW[m.nivel];
+  $('#result').hidden=true;$('#shadowBox').hidden=true;
+  $('#timer').textContent='0 ms';$('#timer').classList.remove('late');
+  $('#emergency').classList.remove('flash');void $('#emergency').offsetWidth;$('#emergency').classList.add('flash');
+  setMic('idle','Toca y responde por radio');
+  renderMetrics();
+  log('ALERT',`${m.id} [${m.nivel} · ${m.etapa}] "${m.alerta}"`);
+  const my=++RUN.flow;
+  if(S.settings.strict)armTimer('alerta en pantalla');
+  else{RUN.armed=false;$('#timer').textContent='audio…';}
+  if(S.settings.tts){
+    log('TTS','leyendo alerta en en-US');
+    speak(m.alerta,0.95).then(done=>{
+      if(my!==RUN.flow||FSM.state!=='alert')return;
+      if(!S.settings.strict&&!RUN.armed)armTimer('fin del audio');
+    });
+  }else if(!S.settings.strict)armTimer('alerta en pantalla');
+}
+function nextMission(){
+  hush();abortRec();
+  if(!S.queue.length)rebuildQueue();
+  if(!S.queue.length){
+    if(FSM.state!=='empty')FSM.go('empty','cola vacía');
+    showEmpty();return;
+  }
+  FSM.go('alert','siguiente misión');
+  showAlert(S.queue[0]);
+}
+function showEmpty(){
+  RUN.armed=false;
+  $('#alertTitle').textContent='Turno completado';
+  $('#alertText').textContent='All alerts for today are cleared. Good shift.';
+  $('#alertInstr').textContent=allowedNew().length?'Toca el micrófono para practicar 7 alertas nuevas más.':'Toca el micrófono para repasar por adelantado tus alertas dominadas.';
+  ['#chipLevel','#chipStage','#chipId','#chipState'].forEach(s=>$(s).textContent='—');
+  $('#queueInfo').textContent='Cola SM-2: 0';
+  $('#result').hidden=true;$('#shadowBox').hidden=true;$('#timer').textContent='—';
+  setMic('idle','Practicar más');
+  renderMetrics();
+  log('SM2','cola del día completada');
+}
+async function startAnswer(){
+  const m=byId[RUN.id];
+  hush();
+  RUN.friction=RUN.armed?performance.now()-RUN.t0:0;
+  RUN.armed=false;cancelAnimationFrame(RUN.raf);
+  if(!S.settings.strict&&RUN.friction===0){RUN.friction=0;log('TIME','audio interrumpido: fricción 0 ms');}
+  $('#timer').textContent=fmtInt(RUN.friction)+' ms';
+  $('#timer').classList.toggle('late',RUN.friction>FRICTION_LIMIT);
+  log('TIME',`Fricción Cognitiva Δt=${Math.round(RUN.friction)} ms${RUN.friction>FRICTION_LIMIT?' · RETRASO > 3000 ms':''}`);
+  FSM.go('listening','micrófono presionado');
+  setMic('rec','Grabando… toca para terminar');
+  const my=RUN.flow;
+  let r;
+  try{r=await listenAnswer(m);}
+  catch(e){
+    if(my!==RUN.flow)return;
+    S.tpaMs+=e.tpa||0;
+    log('ERR','Reconocimiento: '+e.code);
+    showError(SR_ERR[e.code]||SR_ERR.unknown);
+    FSM.go('alert','error de micrófono');RUN.armed=false;
+    setMic('idle','Toca e intenta otra vez');
+    return;
+  }
+  if(my!==RUN.flow)return;
+  S.tpaMs+=r.tpa;
+  if(r.aborted){FSM.go('alert','grabación cancelada');setMic('idle','Toca y responde por radio');return;}
+  if(!r.alts.length){
+    log('WARN','sin voz detectada');
+    showError('No te escuché. Habla cerca del micrófono y vuelve a tocar el botón.');
+    FSM.go('alert','sin voz');setMic('idle','Toca y responde otra vez');save();renderMetrics();return;
+  }
+  await evaluateAnswer(m,r.alts);
+}
+function showError(msg){
+  const e=$('#errBox');e.textContent=msg;e.hidden=false;
+  clearTimeout(showError.t);showError.t=setTimeout(()=>{e.hidden=true;},7000);
+}
+async function evaluateAnswer(m,alts){
+  FSM.go('processing','evaluando');
+  setMic('proc','Procesando…');
+  const loc=bestLocal(m,alts);
+  log('SEM',`local SemScore=${loc.score.toFixed(1)}% kw=${(loc.kw*100).toFixed(0)}% palabras=${loc.words} "${loc.text}"`);
+  let sem=loc.score,source='local',ai=null;
+  if(S.settings.aiOn&&S.settings.aiKey){
+    ai=await aiJudge(m,loc.text);
+    if(ai){sem=ai.score;source='IA';}
+  }
+  const friction=RUN.friction;
+  const q=qualityFrom(sem,friction);
+  const ok=sem>=SEM_PASS&&friction<=FRICTION_LIMIT;
+  const c=card(m.id);
+  const {ef0,ef}=sm2(c,q);
+  log('SM2',`${m.id} q=${q} EF ${ef0.toFixed(2)}→${ef.toFixed(2)} n=${c.n} I=${c.interval}d estado=${c.state}`);
+  const where=requeue(m.id,q);
+  if(ok){S.combo+=1;if(bumpStreak())log('OK',`racha: ${S.streak.days} día(s)`);}else S.combo=0;
+  S.history.push({id:m.id,ts:Date.now(),friction:Math.round(friction),sem,q,ok,src:source});
+  if(S.history.length>400)S.history.splice(0,S.history.length-400);
+  save();renderMetrics();
+  log(ok?'OK':'FAIL',`${ok?'ÉXITO':'NO SUPERADA'} · SemScore ${sem.toFixed(1)}% (${source}) · Δt ${Math.round(friction)} ms`);
+  RUN.result={m,loc,ai,sem,source,friction,q,ok,where,ef0,ef};
+  showResult();
+  FSM.go('feedback','resultado');
+  const my=RUN.flow;
+  await speak((ok?'Good copy. ':'Here is a better way to say it. ')+m.feedback,0.95);
+  if(my!==RUN.flow||FSM.state!=='feedback')return;
+  if(ok){
+    setMic('idle','Siguiente alerta');
+    if(S.settings.auto){await sleep(1100);if(my===RUN.flow&&FSM.state==='feedback')nextMission();}
+  }else{
+    FSM.go('shadow','repetir frase óptima');
+    $('#shadowBox').hidden=false;$('#shadowOut').textContent='';
+    setMic('idle','Repite la frase óptima');
+    if(S.settings.auto){await sleep(350);if(my===RUN.flow&&FSM.state==='shadow')startShadow();}
+  }
+}
+function showResult(){
+  const R=RUN.result,m=R.m,c=card(m.id);
+  $('#result').hidden=false;
+  $('#result').dataset.ok=R.ok?'1':'0';
+  $('#rTitle').textContent=R.ok?'Alerta resuelta':'Alerta no superada';
+  $('#rTranscript').textContent=R.loc.text;
+  $('#rSem').textContent=R.sem.toFixed(1)+' %';
+  $('#rSem').className=R.sem>=SEM_PASS?'good':'bad';
+  $('#rSemSrc').textContent=R.source==='IA'?'juez IA':'matriz difusa local';
+  $('#rFric').textContent=fmtInt(R.friction)+' ms';
+  $('#rFric').className=R.friction<=FRICTION_LIMIT?'good':'bad';
+  $('#rQ').textContent=R.q;
+  $('#rEf').textContent=`${R.ef0.toFixed(2)} → ${R.ef.toFixed(2)}`;
+  $('#rNext').textContent=R.ok?(c.interval===1?'mañana':`en ${c.interval} días`):(R.where==='end'?'al final de la cola de hoy':'otra vez en unos minutos');
+  const pen=[];
+  if(R.sem<SEM_PASS)pen.push(`SemScore bajo el ${SEM_PASS} %`);
+  if(R.friction>FRICTION_LIMIT)pen.push('penalización por retraso: tardaste más de 3 000 ms en responder');
+  $('#rPenalty').textContent=pen.join(' · ');$('#rPenalty').hidden=!pen.length;
+  $('#rGroups').innerHTML=R.loc.groups.map(g=>`<span class="kw ${g.score>=1?'hit':g.score>0?'near':'miss'}">${esc(g.label)}</span>`).join('')+
+    R.loc.gram.map(g=>`<span class="kw gram ${g.ok?'hit':'miss'}">${esc(g.label)}</span>`).join('')+
+    `<span class="kw len ${R.loc.len>=1?'hit':'miss'}">${R.loc.words}/${MINW[m.nivel]}+ palabras</span>`;
+  $('#rVerdict').textContent=R.ai?R.ai.verdict:'';$('#rVerdict').hidden=!R.ai||!R.ai.verdict;
+  $('#rOptimal').textContent=m.feedback;
+  $('#rBetter').textContent=R.ai&&R.ai.better&&R.ai.better!==m.feedback?R.ai.better:'';
+  $('#rBetterRow').hidden=!(R.ai&&R.ai.better&&R.ai.better!==m.feedback);
+}
+async function startShadow(){
+  const m=byId[RUN.id];
+  hush();
+  FSM.go('shadowListening','shadowing');
+  setMic('rec','Repite la frase… toca para terminar');
+  const my=RUN.flow;
+  let r;
+  try{r=await listenAnswer(m,{shadow:true});}
+  catch(e){
+    if(my!==RUN.flow)return;
+    log('ERR','Reconocimiento (shadowing): '+e.code);showError(SR_ERR[e.code]||SR_ERR.unknown);
+    FSM.go('shadow','error');setMic('idle','Repite la frase óptima');return;
+  }
+  if(my!==RUN.flow)return;
+  S.tpaMs+=r.tpa;save();renderMetrics();
+  if(r.aborted||!r.alts.length){FSM.go('shadow','sin voz');setMic('idle','Repite la frase óptima');$('#shadowOut').textContent='No te escuché. Toca el micrófono y repite la frase.';return;}
+  const sim=Math.max(...r.alts.map(a=>seqScore(m.feedback,norm(a))));
+  log('SEM',`shadowing similitud=${Math.round(sim*100)}% "${r.alts[0]}"`);
+  $('#shadowOut').textContent=`Repetiste: «${r.alts[0]}» · similitud ${Math.round(sim*100)} %`;
+  FSM.go('shadow','shadowing evaluado');
+  setMic('idle',sim>=0.8?'Siguiente alerta':'Repite la frase otra vez');
+  RUN.shadowTries+=1;
+  RUN.shadowDone=sim>=0.8||RUN.shadowTries>=2;
+  if(sim>=0.8){
+    await speak('Good.',1);
+    if(S.settings.auto){await sleep(700);if(my===RUN.flow&&FSM.state==='shadow')nextMission();}
+  }else if(!RUN.shadowDone){
+    await speak(m.feedback,0.9);
+    if(S.settings.auto&&my===RUN.flow&&FSM.state==='shadow')startShadow();
+  }else{
+    setMic('idle','Siguiente alerta');
+    if(S.settings.auto){await sleep(900);if(my===RUN.flow&&FSM.state==='shadow')nextMission();}
+  }
+}
+async function onMic(){
+  unlockAudio();
+  const st=FSM.state;
+  if(st==='alert'){
+    if(!SR){showError('Este navegador no reconoce voz. Usa Chrome (Android o computadora) o Safari (iPhone).');log('ERR','webkitSpeechRecognition no disponible');return;}
+    $('#errBox').hidden=true;
+    startAnswer();
+  }else if(st==='listening'||st==='shadowListening'){
+    RUN.stopLong=true;stopRec();log('SR','stop manual');
+  }else if(st==='feedback'){
+    if(RUN.result&&RUN.result.ok)nextMission();
+  }else if(st==='shadow'){
+    if(RUN.shadowDone)nextMission();
+    else startShadow();
+  }else if(st==='empty'){
+    const added=rebuildQueueMore();
+    if(added)nextMission();
+  }
+}
+function rebuildQueueMore(){
+  const before=S.queue.length;
+  rebuildQueue(7);
+  if(S.queue.length===before)reviewAhead(7);
+  renderMetrics();
+  return S.queue.length>0;
+}
+let audioUnlocked=false;
+function unlockAudio(){
+  if(audioUnlocked||!HAS_TTS)return;
+  audioUnlocked=true;
+  try{const u=new SpeechSynthesisUtterance(' ');u.volume=0;speechSynthesis.speak(u);}catch(e){audioUnlocked=false;}
+}
+
+/* ============ AJUSTES ============ */
+function bindSettings(){
+  const map=[['#optTts','tts'],['#optAuto','auto'],['#optStrict','strict'],['#optAi','aiOn']];
+  map.forEach(([sel,key])=>{
+    const el=$(sel);el.checked=!!S.settings[key];
+    el.addEventListener('change',()=>{S.settings[key]=el.checked;save();log('CFG',`${key}=${el.checked}`);
+      if(key==='aiOn'&&el.checked&&!S.settings.aiKey)showError('Pega tu API key de OpenAI para usar el juez IA. Mientras tanto se usa la matriz difusa local.');});
+  });
+  $('#aiKey').value=S.settings.aiKey||'';
+  $('#aiModel').value=S.settings.aiModel||'gpt-4o-mini';
+  $('#aiKey').addEventListener('change',()=>{S.settings.aiKey=$('#aiKey').value.trim();save();log('CFG','API key '+(S.settings.aiKey?'guardada en este navegador':'borrada'));});
+  $('#aiModel').addEventListener('change',()=>{S.settings.aiModel=$('#aiModel').value.trim()||'gpt-4o-mini';save();log('CFG','modelo='+S.settings.aiModel);});
+  $('#aiTest').addEventListener('click',async()=>{
+    S.settings.aiKey=$('#aiKey').value.trim();S.settings.aiModel=$('#aiModel').value.trim()||'gpt-4o-mini';save();
+    const out=$('#aiStatus');
+    if(!S.settings.aiKey){out.textContent='Pega una API key primero.';return;}
+    out.textContent='Probando…';
+    const prev=S.settings.aiOn;S.settings.aiOn=true;
+    const r=await aiJudge(MISSIONS[0],'Copy that, adding frother to cell three now.');
+    S.settings.aiOn=prev;
+    out.textContent=r?`Conectado · puntaje de prueba ${r.score}`:'Sin respuesta válida: se usará la matriz difusa local. Mira la consola.';
+  });
+  let armed=0;
+  $('#resetBtn').addEventListener('click',()=>{
+    if(Date.now()-armed<5000){
+      const keep=S.settings;S=freshState();S.settings=keep;save();log('WARN','progreso borrado');
+      armed=0;$('#resetBtn').textContent='Borrar progreso';rebuildQueue();renderMetrics();if(FSM.state!=='boot'){FSM.state='feedback';nextMission();}
+      return;
+    }
+    armed=Date.now();$('#resetBtn').textContent='Toca otra vez para confirmar';
+    setTimeout(()=>{if(Date.now()-armed>=4900)$('#resetBtn').textContent='Borrar progreso';},5000);
+  });
+  $('#sideToggle').addEventListener('click',()=>{const open=document.body.classList.toggle('side-open');$('#sideToggle').setAttribute('aria-expanded',String(open));});
+  $('#consoleToggle').addEventListener('click',()=>{const c=$('#consoleWrap');c.classList.toggle('collapsed');$('#consoleToggle').textContent=c.classList.contains('collapsed')?'Mostrar':'Ocultar';});
+  $('#consoleClear').addEventListener('click',()=>{$('#console').innerHTML='';log('SYS','consola limpia');});
+  $('#btnPlayAlert').addEventListener('click',()=>{const m=byId[RUN.id];if(m&&FSM.state!=='listening'&&FSM.state!=='shadowListening'){unlockAudio();speak(m.alerta,0.85);log('TTS','alerta repetida (lenta)');}});
+  $('#btnPlayOptimal').addEventListener('click',()=>{const m=byId[RUN.id];if(m){unlockAudio();speak(m.feedback,0.9);log('TTS','frase óptima');}});
+  $('#btnNext').addEventListener('click',()=>{if(['feedback','shadow'].includes(FSM.state))nextMission();});
+}
+
+/* ============ ARRANQUE ============ */
+function compatibility(){
+  const w=[];
+  const framed=(()=>{try{return window.self!==window.top;}catch(e){return true;}})();
+  if(framed)w.push('Estás viendo una vista previa dentro de otra página: el navegador bloquea el micrófono. Abre la dirección web directamente.');
+  if(!SR)w.push('Este navegador no tiene reconocimiento de voz. Usa Google Chrome (Android o computadora) o Safari (iPhone).');
+  if(!window.isSecureContext)w.push('La página no se abrió por https: el navegador bloqueará el micrófono.');
+  if(!HAS_TTS)w.push('Este navegador no puede leer las alertas en voz alta.');
+  return w;
+}
+function boot(){
+  bindSettings();
+  log('SYS',`Control Room English · ${MISSIONS.length} misiones · SM-2 · en-US`);
+  log('SYS',`SpeechRecognition=${SR?'sí':'no'} · speechSynthesis=${HAS_TTS?'sí':'no'} · https=${window.isSecureContext}`);
+  if(navigator.permissions&&navigator.permissions.query){
+    navigator.permissions.query({name:'microphone'}).then(p=>{log('SYS','permiso de micrófono: '+p.state);p.onchange=()=>log('SYS','permiso de micrófono: '+p.state);}).catch(()=>log('SYS','permiso de micrófono: no consultable'));
+  }
+  const w=compatibility();
+  $('#bootWarn').innerHTML=w.map(x=>`<li>${esc(x)}</li>`).join('');$('#bootWarn').hidden=!w.length;
+  rebuildQueue();renderMetrics();
+  $('#mic').addEventListener('click',onMic);
+  $('#bootBtn').addEventListener('click',()=>{
+    unlockAudio();
+    $('#boot').hidden=true;
+    log('SYS','turno iniciado');
+    if(S.queue.length){FSM.go('alert','inicio de turno');showAlert(S.queue[0]);}
+    else{FSM.go('empty','sin tarjetas');showEmpty();}
+  });
+  document.addEventListener('keydown',e=>{
+    if(!$('#boot').hidden)return;
+    if(e.target&&/INPUT|TEXTAREA|SELECT|BUTTON/.test(e.target.tagName))return;
+    if(e.code==='Space'){e.preventDefault();if(!e.repeat)onMic();}
+    else if(e.key==='Enter'&&['feedback','shadow'].includes(FSM.state)){e.preventDefault();RUN.shadowTries=0;nextMission();}
+  });
+  document.addEventListener('visibilitychange',()=>{
+    if(document.hidden&&['listening','shadowListening'].includes(FSM.state)){abortRec();log('WARN','app en segundo plano: grabación cancelada');}
+    if(!document.hidden&&localDay()!==S.queueDay){rebuildQueue();renderMetrics();log('SYS','nuevo día: cola actualizada');}
+  });
+  window.addEventListener('online',()=>log('SYS','conexión restablecida'));
+  window.addEventListener('offline',()=>log('WARN','sin conexión: el reconocimiento de voz puede fallar'));
+  window.addEventListener('error',e=>log('ERR','JS: '+e.message));
+  window.addEventListener('unhandledrejection',e=>log('ERR','Promesa: '+(e.reason&&e.reason.message||e.reason)));
+}
+boot();
+</script>
+</body>
+</html>
